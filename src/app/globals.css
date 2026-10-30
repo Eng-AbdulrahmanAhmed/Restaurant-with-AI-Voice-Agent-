@@ -1,26 +1,23 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+/* --- STYLE MOD: exposed brand palette as real Tailwind tokens (undo: restore the :root block) --- */
+@theme {
+  --color-orange: #F97316;
+  --color-burnt-orange: #C2410C;
+  --color-cream: #FFF7ED;
+  --color-charcoal: #292524;
+  --color-muted: #78716C;
+  --color-line: rgba(194, 65, 12, 0.48);
+  --color-orange-soft: rgba(249, 115, 22, 0.08);
+  --color-orange-line: rgba(249, 115, 22, 0.22);
+  /* --- STYLE MOD: deepest step of the ramp, for the nav Sign-in hover.
+      (undo: delete this line and use bg-[#9A3412] instead) --- */
+  --color-deep-burnt: #9A3412;
+  /* --- STYLE MOD: wire the Geist fonts you already load in layout.tsx (undo: delete these two lines) --- */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+* { 
+  box-sizing: border-box; 
 }
