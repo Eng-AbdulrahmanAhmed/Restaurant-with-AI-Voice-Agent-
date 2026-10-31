@@ -17,9 +17,32 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, MailCheck } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Forgot() {
     const [sent, setSent] = useState(false);
+    const supabase = createClient();
+    const [email, setEmail] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    async function handleReset(e:React.FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+        setError("")
+        setLoading(true)
+
+        const {error: resetError} = await supabase.auth.resetPasswordForEmail(email , {
+            redirectTo: `${window.location.origin}/auth/update-password`,
+        })
+        if (resetError) {
+            setError(resetError.message);
+            setLoading(false);
+            return;
+        }
+
+        setSent(true);
+        setLoading(false);
+    }
 
     return (
         <div className="my-auto w-full max-w-md flex flex-col gap-6">
@@ -49,7 +72,8 @@ export default function Forgot() {
                         </span>
                         <h2 className="mt-3 text-sm font-semibold text-charcoal">Check your inbox</h2>
                         <p className="text-sm text-muted">
-                            A reset link is on its way. It can take a minute or two to arrive.
+                            A reset link is on its way — it opens a page to set your new
+                            password. It can take a minute or two to arrive.
                         </p>
                         <Link
                             href="/auth/signin"
@@ -63,10 +87,7 @@ export default function Forgot() {
                 </div>
             ) : (
                 <form
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        setSent(true);
-                    }}
+                    onSubmit={handleReset}
                     className="rounded-2xl border border-line/20 bg-white p-5 shadow-sm"
                 >
                     <div className="space-y-4">
@@ -81,6 +102,8 @@ export default function Forgot() {
                                 id="email"
                                 name="email"
                                 type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 required
                                 autoComplete="email"
                                 placeholder="you@example.com"
@@ -93,12 +116,19 @@ export default function Forgot() {
 
                     <button
                         type="submit"
+                        disabled={loading}
                         className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-orange
                                    text-sm font-semibold text-cream transition-colors duration-300
                                    hover:bg-burnt-orange"
                     >
-                        Send reset link <ArrowRight size={18} />
+                        {loading ? "Sending..." : "Send reset link"}
+                        {!loading && <ArrowRight size={18} />}
                     </button>
+                    {error && (
+                        <p className="mt-3 text-sm text-red-600" role="alert">
+                            {error}
+                        </p>
+                    )}
                 </form>
             )}
 

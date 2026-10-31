@@ -9,7 +9,7 @@ export default function layout({children}:LayoutProps<"/">){
         <section className="h-screen w-full flex">
             {/* STYLE MOD — wider padding so content clears ~64px like the reference
                 (undo: restore px-8 py-4) */}
-            <div className="w-1/2 bg-[#fcf6ec] px-6 py-6 lg:px-16 flex flex-col ">
+            <div className="w-1/2 bg-[#fcf6ec] px-6 pb-6 pt-2 lg:px-16 flex flex-col  ">
                 <div className="flex items-center justify-between">
                     <Link href={"/"} className='flex items-center ' >
                         <Image alt={"Burger Image"} className=' mr-2' src={burgerLogo} width={50} height={50}/>

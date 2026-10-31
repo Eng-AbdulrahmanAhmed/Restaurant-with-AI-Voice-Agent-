@@ -1,45 +1,91 @@
 'use client';
 
-/* ============================================================================
-   STYLE MOD — rewritten to mirror the sign-in page's reference design.
-   Same building blocks: badge / heading / subtext / white card / pill button /
-   footer switch link. Undo copy of your previous version is at the bottom.
-   ============================================================================ */
-
 import Link from "next/link";
-import { useState } from "react";
+import { useState , type FormEvent} from "react";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
+import GoogleIcon from "@/components/GoogleIcon";
+import { useRouter } from "next/navigation";
+import {
+    signUpWithEmail,
+    signInWithGoogle
+} from "@/lib/supabase/auth";
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    
+    const router = useRouter();
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    async function handleRegister(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        setError("");
+
+        if (password !== confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const data = await signUpWithEmail(email, password, name);
+
+            if (data.session) {
+                router.push("/");
+                router.refresh();
+            } else {
+                setError(
+                    "Account created, but no session was returned. Check your email confirmation settings."
+                );
+            }
+        } catch (err) {
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "Something went wrong. Please try again."
+            );
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleGoogleSignIn() {
+        setError("");
+
+        try {
+            await signInWithGoogle();
+        } catch (err) {
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "Google sign-in failed. Please try again."
+            );
+        }
+    }
 
     return (
-        // STYLE MOD — my-auto replaces the layout's items-center: with items-centre
-        // the content overflows BOTH directions on short screens and you cannot
-        // scroll back up; auto margins collapse to 0 instead, so it scrolls
-        // normally. (undo: delete "my-auto")
-        <div className="my-auto w-full max-w-md flex flex-col gap-6">
-            <div className="space-y-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-orange/15 px-4 py-1.5
-                                 text-xs font-bold uppercase tracking-widest text-burnt-orange">
-                    Fresh • Local • Delicious
-                </span>
-                {/* STYLE MOD — h1 stepped down from text-5xl to text-4xl so the
-                    five-field form fits without scrolling (undo: text-5xl) */}
-                <h1 className="text-4xl font-bold tracking-tight text-charcoal">
+
+        <div className="my-auto w-full max-w-md flex flex-col gap-6 mt-2">
+            <div className="space-y-2">
+                <h1 className="text-3xl font-bold tracking-tight text-charcoal">
                     Create your account!
                 </h1>
-                <p className="text-lg text-muted">
+                <p className="text-md text-muted">
                     Fill in your details and start your delicious journey.
                 </p>
             </div>
 
-            <form
-                onSubmit={(e) => e.preventDefault()}
-                className="rounded-2xl border border-line/20 bg-white p-5 shadow-sm"
-            >
-                {/* STYLE MOD — space-y-5 -> space-y-4 to save vertical room (undo: space-y-5) */}
+
+            <div className="rounded-2xl border border-line/20 bg-white p-5 shadow-sm">
+            <form onSubmit={handleRegister}>
+
                 <div className="space-y-4">
                     <div className="space-y-2">
                         <label htmlFor="name" className="block text-sm font-semibold text-charcoal">
@@ -49,6 +95,8 @@ export default function Register() {
                             id="name"
                             name="name"
                             type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             required
                             autoComplete="name"
                             placeholder="Your name"
@@ -66,6 +114,8 @@ export default function Register() {
                             id="email"
                             name="email"
                             type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                             autoComplete="email"
                             placeholder="you@example.com"
@@ -84,10 +134,12 @@ export default function Register() {
                                 id="password"
                                 name="password"
                                 type={showPassword ? "text" : "password"}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 required
-                                minLength={8}
+                                minLength={6}
                                 autoComplete="new-password"
-                                placeholder="At least 8 characters"
+                                placeholder="At least 6 characters"
                                 className="h-10 w-full rounded-xl border border-line/25 bg-cream pl-4 pr-11 text-sm
                                            text-charcoal placeholder:text-muted/70 outline-none transition
                                            focus:border-orange focus:ring-2 focus:ring-orange/30"
@@ -113,6 +165,8 @@ export default function Register() {
                                 id="confirm"
                                 name="confirm"
                                 type={showConfirm ? "text" : "password"}
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
                                 autoComplete="new-password"
                                 placeholder="Repeat your password"
@@ -133,18 +187,43 @@ export default function Register() {
                     </div>
                 </div>
 
-                {/* TODO STYLE MOD: drop the preventDefault once your register API exists. */}
-                {/* STYLE MOD — button tightened mt-6/h-12 -> mt-5/h-11 so the form fits
-                    on screen (undo: mt-6 h-12) */}
                 <button
                     type="submit"
+                    disabled={loading}
                     className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-orange
-                               text-sm font-semibold text-cream transition-colors duration-300
-                               hover:bg-burnt-orange"
+                            text-sm font-semibold text-cream transition-colors duration-300
+                            hover:bg-burnt-orange disabled:opacity-50"
                 >
-                    Create account <ArrowRight size={18} />
+                    {loading ? "Creating account..." : "Create account"}
+                    {!loading && <ArrowRight size={18} />}
                 </button>
+                {error && (
+                    <p className="mt-3 text-sm text-red-600">
+                        {error}
+                    </p>
+                )}
+                
             </form>
+
+            <div className="mt-5 flex items-center gap-4" role="separator">
+                <span className="h-px flex-1 bg-line/20" />
+                <span className="text-xs font-semibold uppercase tracking-widest text-muted/70">
+                    or continue with
+                </span>
+                <span className="h-px flex-1 bg-line/20" />
+            </div>
+            <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                className="mt-4 flex h-10 w-full items-center justify-center gap-3 rounded-xl border
+                           border-line/25 bg-white text-sm font-semibold text-charcoal
+                           transition-colors duration-300 hover:bg-cream
+                           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+            >
+                <GoogleIcon />
+                Continue with Google
+            </button>
+            </div>
 
             <p className="text-center text-sm text-muted">
                 Already have an account?{" "}
@@ -159,13 +238,3 @@ export default function Register() {
         </div>
     );
 }
-
-/* ===================== PREVIOUS VERSION — undo copy =====================
-export default function Register(){
-    return(
-        <div className="">
-            this is register 
-        </div>
-    )
-}
-===================== end previous version ===================== */
