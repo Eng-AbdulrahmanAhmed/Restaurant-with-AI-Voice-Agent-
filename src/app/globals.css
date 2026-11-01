@@ -95,3 +95,103 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+/* ========================================
+   CARTOON FLAME EFFECT
+======================================== */
+
+@keyframes flame-dance {
+  0%, 100% {
+    transform: scale(1, 1) rotate(-4deg) translateY(0);
+  }
+
+  25% {
+    transform: scale(1.08, 1.12) rotate(4deg) translateY(-2px);
+  }
+
+  50% {
+    transform: scale(0.96, 1.08) rotate(-3deg) translateY(-1px);
+  }
+
+  75% {
+    transform: scale(1.1, 0.96) rotate(3deg) translateY(0);
+  }
+}
+
+.flame-body {
+  transform-origin: center bottom;
+  animation: flame-dance 0.85s ease-in-out infinite;
+  filter:
+    drop-shadow(0 0 4px rgba(242, 105, 13, 0.65))
+    drop-shadow(0 0 9px rgba(242, 105, 13, 0.35));
+}
+
+/* Bouncy glow */
+
+@keyframes flame-glow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 0.85;
+    transform: scale(1.5);
+  }
+}
+
+.flame-glow {
+  animation: flame-glow 1.2s ease-in-out infinite;
+}
+
+/* Cartoon sparks */
+
+.flame-spark {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #FFB52E;
+  box-shadow: 0 0 5px #F2690D;
+  opacity: 0;
+  pointer-events: none;
+  animation: spark-rise 1.5s ease-out infinite;
+}
+
+.spark-one {
+  --spark-x: -13px;
+  animation-delay: 0s;
+}
+
+.spark-two {
+  --spark-x: 12px;
+  animation-delay: 0.45s;
+}
+
+.spark-three {
+  --spark-x: -6px;
+  animation-delay: 0.9s;
+}
+
+.spark-four {
+  display: block;
+  --spark-x: 17px;
+  animation-delay: 1.2s;
+}
+
+@keyframes spark-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+
+  25% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(var(--spark-x), -27px) scale(0);
+  }
+}

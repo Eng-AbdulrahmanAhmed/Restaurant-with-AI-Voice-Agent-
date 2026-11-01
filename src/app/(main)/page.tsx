@@ -58,12 +58,12 @@ export default function Home() {
           {/* Text */}
           <div className="flex flex-col items-start bg-cream rounded-full px-4 py-2">
             {/* Badge */}
-            <div className="inline items-center bg-orange/10 px-4 rounded-full">
-              <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold" aria-hidden="true">Fresh </span>
+            <div className="inline items-center bg-orange/10 px-4 rounded-full items-center">
+              <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold text-sm" aria-hidden="true">Fresh </span>
               <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold text-lg">· </span>
-              <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold">Local </span>
+              <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold text-sm">Local </span>
               <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold text-lg">· </span>
-              <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold">Delicious</span>
+              <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold text-sm">Delicious</span>
             </div>
               
 
@@ -131,8 +131,10 @@ export default function Home() {
               className="animate-float relative z-10 h-auto w-full object-contain drop-shadow-[0_36px_40px_rgba(36,23,8,0.28)]"
             />
 
-            {/* rotating badge */}
+            {/* Rotating flame badge */}
             <div className="absolute -left-2 top-4 z-20 h-28 w-28 md:-left-6 md:h-32 md:w-32">
+
+              {/* Rotating circular text */}
               <svg
                 viewBox="0 0 120 120"
                 className="h-full w-full animate-spin-slow"
@@ -144,7 +146,9 @@ export default function Home() {
                     d="M60 14a46 46 0 1 1 0 92 46 46 0 1 1 0-92"
                   />
                 </defs>
+
                 <circle cx="60" cy="60" r="59" fill="#241708" />
+
                 <text
                   fill="#FAF3E2"
                   fontSize="11.5"
@@ -156,18 +160,54 @@ export default function Home() {
                   </textPath>
                 </text>
               </svg>
-              <svg
-                viewBox="0 0 24 24"
-                className="absolute inset-0 m-auto h-8 w-8 text-orange"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M12 21c3.9 0 6.5-2.6 6.5-6 0-4.5-4-6.5-4-11-3 2-3.5 5-3 7.5C10.3 10.3 9 8.6 9 6c-2.1 2.1-3.5 4.6-3.5 7.5 0 4 2.7 7.5 6.5 7.5z" />
-              </svg>
+
+              {/* Flame container */}
+              <div className="absolute inset-0 flex items-center justify-center">
+
+                {/* Flame glow */}
+                <div className="flame-glow absolute h-9 w-9 rounded-full bg-orange/40 blur-xl" />
+
+                {/* Rising sparks */}
+                <span className="flame-spark spark-one" />
+                <span className="flame-spark spark-two" />
+                <span className="flame-spark spark-three" />
+                <span className="flame-spark spark-four" />
+
+                {/* Main flame */}
+                <svg
+                  viewBox="0 0 48 56"
+                  className="relative z-10 h-10 w-9 flame-body"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <linearGradient id="flameOuter" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#FF9D32" />
+                      <stop offset="55%" stopColor="#F2690D" />
+                      <stop offset="100%" stopColor="#D15400" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Outer flame */}
+                  <path
+                    className="flame-outer"
+                    d="M24 2C22 12 8 18 6 32C3 45 11 54 24 54C38 54 46 44 42 31C39 20 30 15 29 7C27 13 25 16 23 19C25 12 25 7 24 2Z"
+                    fill="url(#flameOuter)"
+                  />
+
+                  {/* Inner yellow flame */}
+                  <path
+                    className="flame-inner"
+                    d="M24 27C21 33 16 37 17 43C18 49 22 51 26 50C32 49 35 43 32 37C30 33 26 30 24 27Z"
+                    fill="#FFD166"
+                  />
+
+                  {/* Hot core */}
+                  <path
+                    d="M25 40C22 43 22 47 25 48C28 48 29 44 25 40Z"
+                    fill="#FFF1C1"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
