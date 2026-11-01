@@ -85,11 +85,11 @@ export default function MenuCatalogHeader({
           <span>Menu Catalog Database</span>
         </div>
 
-        <h1 className="text-3xl font-extrabold tracking-tight text-[#292524]">
+        <h1 className="font-display text-4xl font-black tracking-tight text-ink">
           Manage Our Menu Items
         </h1>
 
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#8B8178]">
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-brown">
           Add new recipes, modify prices, update availability, or mark
           customer fan favorites live on the website.
         </p>
@@ -102,17 +102,17 @@ export default function MenuCatalogHeader({
       <div className="flex flex-col items-center space-y-3 text-center">
         <span
           className="inline-flex items-center gap-2 rounded-full bg-orange/10 px-4 py-2
-                     text-xs font-bold tracking-wide text-[#F97316]"
+                     text-xs font-bold tracking-wide text-orange-deep"
         >
           <Utensils size={15} strokeWidth={2.5} />
           Menu Catalog Database
         </span>
 
-        <h1 className="text-3xl font-extrabold tracking-tight text-[#292524]">
-          Manage Our <span className="text-[#F97316]">Menu Items</span>
+        <h1 className="font-display text-4xl font-black tracking-tight text-ink">
+          Manage Our <span className="italic text-orange">Menu Items</span>
         </h1>
 
-        <p className="max-w-2xl text-sm leading-relaxed text-[#8B8178]">
+        <p className="max-w-2xl text-sm leading-relaxed text-brown">
           Add new recipes, modify prices, update availability, or mark
           customer fan favorites live on the website.
         </p>
@@ -139,7 +139,7 @@ export default function MenuCatalogHeader({
               onClick={() => onCategoryChange(label)}
               className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-200 ${
                 activeCategory === label
-                  ? "bg-[#F97316] text-white shadow-sm"
+                  ? "bg-ink text-cream shadow-[0_8px_18px_-8px_rgba(36,23,8,0.6)]"
                   : "border border-[#EDE7DD] bg-white text-[#78716C] hover:border-orange-200 hover:text-[#F97316]"
               }`}
             >
@@ -163,7 +163,7 @@ export default function MenuCatalogHeader({
           only the active one gets the orange fill. All icons 16px.
           (undo: delete this div, uncomment the OLD split row above) */}
       <div
-        className="flex flex-col gap-4 rounded-2xl border border-[#EDE7DD] bg-white p-2.5 shadow-sm
+        className="flex flex-col gap-4 rounded-[1.75rem] border border-ink/10 bg-white p-2.5 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)]
                    lg:flex-row lg:items-center lg:justify-between"
       >
         <div className="flex flex-wrap items-center gap-1.5">
@@ -174,8 +174,8 @@ export default function MenuCatalogHeader({
               className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold
                           transition-all duration-200 ${
                             activeCategory === label
-                              ? "bg-[#F97316] text-white shadow-sm"
-                              : "text-[#292524] hover:bg-orange/5 hover:text-[#F97316]"
+                              ? "bg-ink text-cream shadow-[0_8px_18px_-8px_rgba(36,23,8,0.6)]"
+                              : "text-ink/70 hover:bg-orange/10 hover:text-orange"
                           }`}
             >
               {/* STYLE MOD v2 — every icon renders in a 16px box: SVG images
@@ -221,14 +221,14 @@ export default function MenuCatalogHeader({
         <div className="relative w-full shrink-0 lg:w-72">
           <Search
             size={16}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A8A29E]"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-brown/50"
           />
           <input
             type="text"
             placeholder="Search dishes..."
-            className="h-10 w-full rounded-full border border-[#EDE7DD]/60 bg-[#F5F5F4] pl-10 pr-4
-                       text-sm text-[#292524] placeholder:text-[#A8A29E] outline-none transition
-                       focus:border-[#F97316] focus:bg-white focus:ring-2 focus:ring-orange-100"
+            className="h-10 w-full rounded-full border border-ink/10 bg-cream pl-10 pr-4
+                       text-sm text-ink placeholder:text-brown/50 outline-none transition
+                       focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
           />
           {/* ============= OLD (v1 — wired search input) =============
           <input

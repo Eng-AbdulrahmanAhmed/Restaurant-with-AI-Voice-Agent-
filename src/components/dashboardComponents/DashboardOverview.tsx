@@ -1,4 +1,3 @@
-
 import {
   Utensils,
   TrendingUp,
@@ -6,64 +5,67 @@ import {
   Banknote,
 } from "lucide-react";
 
+/* REDESIGN — same four stats, restyled with the reference palette:
+   soft white cards on cream, tinted icon chips, Fraunces numbers. */
+
 const stats = [
   {
     title: "Today's Sales",
     value: "$842",
     detail: "Sales today",
     icon: Banknote,
-    iconStyle: "bg-orange-100 text-[#F97316]",
+    iconStyle: "bg-orange/10 text-orange",
   },
   {
     title: "Total Menu Items",
     value: "24",
     detail: "Across all categories",
     icon: Utensils,
-    iconStyle: "bg-orange-100 text-[#F97316]",
+    iconStyle: "bg-gold/15 text-gold",
   },
   {
     title: "Most Popular",
     value: "Classic Smash",
     detail: "128 orders today",
     icon: TrendingUp,
-    iconStyle: "bg-green-100 text-green-600",
+    iconStyle: "bg-lettuce/10 text-lettuce",
   },
   {
     title: "Out of Stock",
     value: "03",
     detail: "Items unavailable",
     icon: PackageX,
-    iconStyle: "bg-red-100 text-red-500",
+    iconStyle: "bg-tomato/10 text-tomato",
   },
 ];
 
 export default function DashboardOverview() {
   return (
-    <section className="flex flex-wrap items-center gap-3 justify-center mt-6">
+    <section className="mt-6 flex flex-wrap items-center justify-center gap-3">
       {stats.map((stat) => {
         const Icon = stat.icon;
 
         return (
           <div
             key={stat.title}
-            className="flex w-full max-w-[230px] items-center gap-3 rounded-xl border border-[#F0E8DE] bg-white px-3.5 py-3 shadow-sm transition-all hover:shadow-md sm:w-[230px]"
+            className="flex w-full max-w-[230px] items-center gap-3 rounded-2xl border border-ink/10 bg-white px-3.5 py-3 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_32px_-22px_rgba(36,23,8,0.45)] sm:w-[230px]"
           >
             <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${stat.iconStyle}`}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${stat.iconStyle}`}
             >
               <Icon size={19} strokeWidth={2} />
             </div>
 
             <div className="min-w-0">
-              <p className="text-xs font-medium text-[#8B8178]">
+              <p className="text-xs font-medium text-brown/70">
                 {stat.title}
               </p>
 
-              <h3 className="mt-0.5 truncate text-lg font-bold text-[#292524]">
+              <h3 className="mt-0.5 truncate font-display text-lg font-bold text-ink">
                 {stat.value}
               </h3>
 
-              <p className="mt-0.5 truncate text-[11px] text-[#A8A29E]">
+              <p className="mt-0.5 truncate text-[11px] text-brown/50">
                 {stat.detail}
               </p>
             </div>

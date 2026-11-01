@@ -127,7 +127,7 @@ export default function MenuCatalogGrid({
                             <h3 className="truncate text-sm font-bold text-[#292524]">
                                 {item.name}
                             </h3>
-                            <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-[#8B8178]">
+                            <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-brown">
                                 {item.description}
                             </p>
 
@@ -155,21 +155,22 @@ export default function MenuCatalogGrid({
                         photo row with big price, divider, manage toolbar */
                     <article
                         key={item.id}
-                        className="flex flex-col rounded-2xl border border-[#F0E8DE] bg-white p-5 shadow-sm
-                                   transition-shadow hover:shadow-md"
+                        className="flex flex-col rounded-[1.75rem] border border-ink/10 bg-white p-5
+                                   shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)]
+                                   transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_32px_-22px_rgba(36,23,8,0.45)]"
                     >
                         {/* STYLE MOD v2 — category chip (left) + Popular badge (right)
                             (undo: delete this div) */}
                         <div className="flex items-center justify-between">
                             <span
                                 className="rounded-full bg-orange/10 px-3 py-1 text-[10px] font-extrabold
-                                           uppercase tracking-wider text-[#F97316]"
+                                           uppercase tracking-wider text-orange-deep"
                             >
                                 {item.category}
                             </span>
                             {item.popular && (
                                 <span
-                                    className="inline-flex items-center gap-1 rounded-full bg-[#F97316]
+                                    className="inline-flex items-center gap-1 rounded-full bg-orange
                                                px-3 py-1 text-[11px] font-bold text-white"
                                 >
                                     <Star size={12} fill="currentColor" strokeWidth={0} />
@@ -182,7 +183,7 @@ export default function MenuCatalogGrid({
                             big orange price like the reference (undo: delete div) */}
                         <div className="mt-4 flex items-center gap-4">
                             <div
-                                className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-cream"
+                                className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-cream-deep"
                             >
                                 <Image
                                     src={item.image}
@@ -193,13 +194,13 @@ export default function MenuCatalogGrid({
                                 />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <h3 className="truncate text-lg font-extrabold text-[#292524]">
+                                <h3 className="truncate font-display text-lg font-bold text-ink">
                                     {item.name}
                                 </h3>
-                                <p className="mt-1 text-xs leading-relaxed text-[#8B8178]">
+                                <p className="mt-1 text-xs leading-relaxed text-brown">
                                     {item.description}
                                 </p>
-                                <p className="mt-2 text-xl font-extrabold text-[#F97316]">
+                                <p className="mt-2 font-display text-xl font-bold text-orange">
                                     ${item.price.toFixed(2)}
                                 </p>
                             </div>
@@ -207,7 +208,7 @@ export default function MenuCatalogGrid({
 
                         {/* STYLE MOD v2 — divider between the item info and the
                             manage toolbar (undo: delete) */}
-                        <hr className="my-4 border-[#F0E8DE]/70" />
+                        <hr className="my-4 border-ink/10" />
 
                         {/* STYLE MOD v2 — manage toolbar: stock chip + favorite star
                             toggle left, edit/delete icon buttons right
@@ -215,12 +216,12 @@ export default function MenuCatalogGrid({
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 ">
                                 <span
-                                    className="group inline-flex items-center gap-1.5 rounded-full bg-[#F5F5F4]
-                                               px-3 py-1.5 text-[11px] font-semibold text-[#78716C]
-                                               hover:bg-red-50 group-hover:text-red-600"
+                                    className="group inline-flex items-center gap-1.5 rounded-full bg-cream-deep
+                                               px-3 py-1.5 text-[11px] font-semibold text-brown
+                                               hover:bg-tomato/10 group-hover:text-tomato"
                                 >
-                                    <Ban size={13} strokeWidth={2.5} className="group-hover:stroke-red-600 "/>
-                                    <span className="group-hover:text-red-600">{item.stock} Item</span>
+                                    <Ban size={13} strokeWidth={2.5} className="group-hover:stroke-tomato "/>
+                                    <span className="group-hover:text-tomato">{item.stock} Item</span>
                                 </span>
 
                                 {/* STYLE MOD — favorite star: filled amber for fan
@@ -232,8 +233,8 @@ export default function MenuCatalogGrid({
                                     className={`flex h-8 w-8 items-center justify-center rounded-lg
                                                 transition-colors duration-200 ${
                                                     item.popular
-                                                        ? "bg-amber-100 text-amber-500 hover:bg-amber-200"
-                                                        : "bg-stone-100 text-stone-300 hover:text-stone-400"
+                                                        ? "bg-gold/20 text-gold hover:bg-gold/30"
+                                                        : "bg-cream-deep text-ink/25 hover:text-ink/40"
                                                 }`}
                                 >
                                     <Star size={16} fill="currentColor" strokeWidth={0} />
@@ -245,8 +246,8 @@ export default function MenuCatalogGrid({
                                     type="button"
                                     title={`Edit ${item.name}`}
                                     className="flex h-8 w-8 items-center justify-center rounded-lg
-                                               text-stone-400 transition-colors duration-200
-                                               hover:bg-orange/10 hover:text-[#F97316]"
+                                               text-brown/50 transition-colors duration-200
+                                               hover:bg-orange/10 hover:text-orange"
                                 >
                                     <Pencil size={16} strokeWidth={2} />
                                 </button>
@@ -254,8 +255,8 @@ export default function MenuCatalogGrid({
                                     type="button"
                                     title={`Delete ${item.name}`}
                                     className="flex h-8 w-8 items-center justify-center rounded-lg
-                                               text-stone-400 transition-colors duration-200
-                                               hover:bg-red-50 hover:text-red-500"
+                                               text-brown/50 transition-colors duration-200
+                                               hover:bg-tomato/10 hover:text-tomato"
                                 >
                                     <Trash2 size={16} strokeWidth={2} />
                                 </button>
@@ -266,8 +267,8 @@ export default function MenuCatalogGrid({
 
                 {items.length === 0 && (
                     <p
-                        className="col-span-full rounded-xl border border-dashed border-[#EDE7DD] bg-white/60
-                                   py-10 text-center text-sm text-[#A8A29E]"
+                        className="col-span-full rounded-xl border border-dashed border-ink/15 bg-white/60
+                                   py-10 text-center text-sm text-brown/60"
                     >
                         No menu items match your search.
                     </p>
@@ -287,8 +288,8 @@ export default function MenuCatalogGrid({
                             className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold
                                         transition-all duration-200 ${
                                             p === page
-                                                ? "bg-orange text-white shadow-sm"
-                                                : "border border-[#EDE7DD] bg-white text-[#78716C] hover:text-[#F97316]"
+                                                ? "bg-ink text-cream shadow-sm"
+                                                : "border border-ink/10 bg-white text-brown hover:text-orange"
                                         }`}
                         >
                             {p}
@@ -299,8 +300,8 @@ export default function MenuCatalogGrid({
                         title="Next page"
                         disabled={page === totalPages}
                         onClick={() => onPageChange(page + 1)}
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-[#EDE7DD]
-                                   bg-white text-[#78716C] transition-all duration-200 hover:text-[#F97316]
+                        className="flex h-8 w-8 items-center justify-center rounded-full border border-ink/10
+                                   bg-white text-brown transition-all duration-200 hover:text-orange
                                    disabled:cursor-not-allowed disabled:opacity-40"
                     >
                         <ChevronRight size={15} />

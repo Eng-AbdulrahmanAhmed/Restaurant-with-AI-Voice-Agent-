@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from "next/link";
@@ -12,6 +11,10 @@ import {
 } from "lucide-react";
 
 import burgerLogo from "@/assets/logo-no-background.png";
+
+/* REDESIGN — reference styling: sticky cream bar with blur, Fraunces
+   wordmark, segmented pill nav (active = ink), orange pill CTA.
+   Same links, same active-route logic, same sign-out button. */
 
 const navLinks = [
     { label: "Menu Items", href: "/dashboard", icon: LayoutGrid },
@@ -32,11 +35,14 @@ export default function DashboardNavbar() {
 
     return (
         <header className="
+            sticky top-0 z-40
             grid grid-cols-[1fr_auto_1fr]
             items-center
             h-[76px]
             px-6 lg:px-10
-            bg-cream
+            bg-cream/90
+            border-b border-ink/[0.06]
+            backdrop-blur-md
         ">
 
             {/* Logo */}
@@ -46,11 +52,11 @@ export default function DashboardNavbar() {
                         alt="BurgerHouse Logo"
                         className="mr-2"
                         src={burgerLogo}
-                        width={48}
-                        height={48}
+                        width={40}
+                        height={40}
                     />
 
-                    <span className="text-lg font-semibold text-charcoal">
+                    <span className="font-display text-xl font-bold tracking-tight text-ink">
                         Burger
                         <span className="text-orange">House.</span>
                     </span>
@@ -61,10 +67,10 @@ export default function DashboardNavbar() {
             <nav className="
                 flex items-center justify-center
                 rounded-full
-                bg-white/70
-                border border-[#EDE7DD]
+                bg-white
+                border border-ink/10
                 p-1.5
-                shadow-sm
+                shadow-[0_10px_24px_-18px_rgba(36,23,8,0.35)]
             ">
                 <ul className="flex items-center gap-1">
                     {navLinks.map(({ label, href, icon: Icon }) => (
@@ -82,8 +88,8 @@ export default function DashboardNavbar() {
                                     transition-all duration-300 ease-out
                                     ${
                                         isActive(href)
-                                            ? "bg-orange text-cream shadow-[0_3px_10px_-3px_rgba(249,115,22,0.45)]"
-                                            : "text-charcoal/65 hover:text-orange hover:bg-orange/5"
+                                            ? "bg-ink text-cream shadow-[0_8px_18px_-8px_rgba(36,23,8,0.6)]"
+                                            : "text-ink/65 hover:text-orange hover:bg-orange/10"
                                     }
                                 `}
                             >
@@ -106,13 +112,12 @@ export default function DashboardNavbar() {
                     className="
                         flex h-[42px] items-center justify-center
                         rounded-full
-                        text-xs
                         bg-orange px-6
                         text-sm font-semibold text-cream
-                        shadow-[0_0_12px_-4px_rgba(249,115,22,0.3)]
+                        shadow-[0_10px_24px_-8px_rgba(242,105,13,0.6)]
                         hover:-translate-y-0.5
-                        hover:bg-deep-burnt
-                        hover:shadow-[0_0_24px_-4px_rgba(194,65,12,0.45)]
+                        hover:bg-orange-deep
+                        hover:shadow-[0_14px_28px_-8px_rgba(242,105,13,0.7)]
                         active:translate-y-0
                         transition-all duration-300
                         focus-visible:outline-2
@@ -123,7 +128,7 @@ export default function DashboardNavbar() {
                     + Add New Item
                 </Link>
 
-                <span className="h-7 w-px bg-[#E6E1D8]" />
+                <span className="h-7 w-px bg-ink/10" />
 
                 <button
                     type="button"
@@ -134,11 +139,11 @@ export default function DashboardNavbar() {
                         flex items-center justify-center
                         rounded-full
                         bg-white
-                        border border-[#E6E1D8]
-                        text-stone-600
-                        hover:text-red-600
-                        hover:bg-red-50
-                        hover:border-red-200
+                        border border-ink/10
+                        text-brown
+                        hover:text-tomato
+                        hover:bg-tomato/10
+                        hover:border-tomato/30
                         transition-all duration-200
                         shadow-sm
                     "

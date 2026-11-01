@@ -1,23 +1,97 @@
 @import "tailwindcss";
 
-/* --- STYLE MOD: exposed brand palette as real Tailwind tokens (undo: restore the :root block) --- */
+/* ============================================================================
+   REDESIGN — palette, fonts and motion imported from the BurgerHouse
+   reference one-pager ("Kimi Agent Page Redesign — Same Colors").
+
+   The old token names (charcoal, muted, line, burnt-orange, deep-burnt…)
+   are kept as ALIASES pointing at the new palette, so any class that still
+   uses them automatically picks up the new look.
+   ============================================================================ */
 @theme {
-  --color-orange: #F97316;
-  --color-burnt-orange: #C2410C;
-  --color-cream: #FFF7ED;
-  --color-charcoal: #292524;
-  --color-muted: #78716C;
-  --color-line: rgba(194, 65, 12, 0.48);
-  --color-orange-soft: rgba(249, 115, 22, 0.08);
-  --color-orange-line: rgba(249, 115, 22, 0.22);
-  /* --- STYLE MOD: deepest step of the ramp, for the nav Sign-in hover.
-      (undo: delete this line and use bg-[#9A3412] instead) --- */
-  --color-deep-burnt: #9A3412;
-  /* --- STYLE MOD: wire the Geist fonts you already load in layout.tsx (undo: delete these two lines) --- */
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* --- reference palette --- */
+  --color-cream: #FAF3E2;
+  --color-cream-deep: #F2E6CC;
+  --color-peach: #F8E3C3;
+  --color-ink: #241708;
+  --color-brown: #6F5230;
+  --color-orange: #F2690D;
+  --color-orange-deep: #D15400;
+  --color-gold: #E9A13B;
+  --color-lettuce: #5C8A3A;
+  --color-tomato: #E2482F;
+
+  /* --- legacy aliases, remapped to the reference palette --- */
+  --color-charcoal: #241708;            /* was #292524 */
+  --color-muted: #6F5230;               /* was #78716C */
+  --color-burnt-orange: #D15400;        /* was #C2410C */
+  --color-deep-burnt: #D15400;          /* was #9A3412 */
+  --color-line: rgba(36, 23, 8, 0.48);
+  --color-orange-soft: rgba(242, 105, 13, 0.08);
+  --color-orange-line: rgba(242, 105, 13, 0.22);
+
+  /* --- fonts: Fraunces for display, Poppins for body --- */
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
+
+  /* --- motion, straight from the reference --- */
+  --animate-marquee: marquee-x 28s linear infinite;
+  --animate-spin-slow: spin-slow 22s linear infinite;
+  --animate-float: float-y 5.5s ease-in-out infinite;
+  --animate-float-delayed: float-y 6.5s ease-in-out 0.8s infinite;
+  --animate-bump: bump 0.35s ease-out;
+  --animate-wave: wave-drift 9s linear infinite;
+
+  @keyframes marquee-x {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @keyframes spin-slow {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-14px); }
+  }
+  @keyframes bump {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); }
+    100% { transform: scale(1); }
+  }
+  @keyframes wave-drift {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-160px); }
+  }
 }
 
-* { 
-  box-sizing: border-box; 
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-orange);
+  color: var(--color-cream);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

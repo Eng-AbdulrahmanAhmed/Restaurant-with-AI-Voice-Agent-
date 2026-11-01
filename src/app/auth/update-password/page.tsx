@@ -102,14 +102,14 @@ export default function UpdatePassword() {
         // naturally instead of clipping the form at both ends. (undo: delete "my-auto")
         <div className="my-auto w-full max-w-md flex flex-col gap-6">
             <div className="space-y-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-orange/15 px-4 py-1.5
-                                 text-xs font-bold uppercase tracking-widest text-burnt-orange">
+                <span className="inline-flex items-center gap-2 rounded-full bg-orange/10 px-4 py-1.5
+                                 text-xs font-semibold uppercase tracking-[0.18em] text-orange-deep">
                     Fresh • Local • Delicious
                 </span>
-                <h1 className="text-4xl font-bold tracking-tight text-charcoal">
+                <h1 className="font-display text-4xl font-black tracking-tight text-ink">
                     Set a new password
                 </h1>
-                <p className="text-lg text-muted">
+                <p className="text-lg text-brown">
                     Choose a new password for your account.
                 </p>
             </div>
@@ -119,11 +119,11 @@ export default function UpdatePassword() {
                 already exists. (undo: swap onSubmit for nothing) */}
             <form 
                 onSubmit={handleUpdatePassword}
-                className="rounded-2xl border border-line/20 bg-white p-5 shadow-sm"
+                className="rounded-[1.75rem] border border-ink/10 bg-white p-6 shadow-[0_18px_40px_-24px_rgba(36,23,8,0.25)]"
             >
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <label htmlFor="password" className="block text-sm font-semibold text-charcoal">
+                        <label htmlFor="password" className="block text-sm font-semibold text-ink">
                             Password
                         </label>
                         <div className="relative">
@@ -137,16 +137,16 @@ export default function UpdatePassword() {
                                 minLength={6}
                                 autoComplete="new-password"
                                 placeholder="At least 6 characters"
-                                className="h-10 w-full rounded-xl border border-line/25 bg-cream pl-4 pr-11 text-sm
-                                           text-charcoal placeholder:text-muted/70 outline-none transition
+                                className="h-10 w-full rounded-xl border border-ink/10 bg-cream pl-4 pr-11 text-sm
+                                           text-ink placeholder:text-brown/50 outline-none transition
                                            focus:border-orange focus:ring-2 focus:ring-orange/30"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword((v) => !v)}
                                 aria-label={showPassword ? "Hide password" : "Show password"}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted/70
-                                           transition-colors hover:text-charcoal"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-brown/70
+                                           transition-colors hover:text-ink"
                             >
                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
@@ -154,7 +154,7 @@ export default function UpdatePassword() {
                     </div>
 
                     <div className="space-y-2">
-                        <label htmlFor="confirm" className="block text-sm font-semibold text-charcoal">
+                        <label htmlFor="confirm" className="block text-sm font-semibold text-ink">
                             Confirm password
                         </label>
                         <div className="relative">
@@ -167,16 +167,16 @@ export default function UpdatePassword() {
                                 required
                                 autoComplete="new-password"
                                 placeholder="Repeat your password"
-                                className="h-10 w-full rounded-xl border border-line/25 bg-cream pl-4 pr-11 text-sm
-                                           text-charcoal placeholder:text-muted/70 outline-none transition
+                                className="h-10 w-full rounded-xl border border-ink/10 bg-cream pl-4 pr-11 text-sm
+                                           text-ink placeholder:text-brown/50 outline-none transition
                                            focus:border-orange focus:ring-2 focus:ring-orange/30"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowConfirm((v) => !v)}
                                 aria-label={showConfirm ? "Hide password" : "Show password"}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted/70
-                                           transition-colors hover:text-charcoal"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-brown/70
+                                           transition-colors hover:text-ink"
                             >
                                 {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
@@ -190,7 +190,7 @@ export default function UpdatePassword() {
                     (undo: delete this whole block) */}
                 {error && (
                     <div
-                        className="mt-3 text-sm text-red-500"
+                        className="mt-3 text-sm text-tomato"
                         role="alert"
                     >
                         {error}
@@ -198,13 +198,13 @@ export default function UpdatePassword() {
                 )}
                 
                 {!sessionChecked && (
-                    <p className="mt-3 text-sm text-muted" role="status">
+                    <p className="mt-3 text-sm text-brown" role="status">
                         Checking your password reset link...
                     </p>
                 )}
 
                 {sessionChecked && !validSession && (
-                    <div className="mt-3 text-sm text-red-500" role="alert">
+                    <div className="mt-3 text-sm text-tomato" role="alert">
                         This password reset link is invalid or has expired.
                         Please request a new password reset link.
                         <Link
@@ -222,19 +222,19 @@ export default function UpdatePassword() {
                 <button
                     type="submit"
                     disabled={!sessionChecked || !validSession || loading}
-                    className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-orange
+                    className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-orange shadow-[0_10px_24px_-8px_rgba(242,105,13,0.6)]
                                text-sm font-semibold text-cream transition-colors duration-300
-                               hover:bg-burnt-orange"
+                               hover:bg-orange-deep"
                 >
                     {loading ? "Updating..." : "Update Password"}
                 </button>
             </form>
 
-            <p className="text-center text-sm text-muted">
+            <p className="text-center text-sm text-brown">
                 Remembered it?{" "}
                 <Link
                     href="/auth/signin"
-                    className="font-semibold text-burnt-orange underline underline-offset-2
+                    className="font-semibold text-orange-deep underline underline-offset-2
                                transition-colors hover:text-orange"
                 >
                     Sign in
