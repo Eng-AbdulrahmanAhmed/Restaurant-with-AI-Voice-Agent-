@@ -8,7 +8,7 @@ export default function Navbar(){
             <div className="image-container flex">
                 <Link href={"/"} className='flex items-center ' >
                     <Image alt={"Burger Image"} className=' mr-2' src={burgerLogo} width={50} height={50}/>
-                    <span className='font-semibold text-charcoal'>Burger House</span>
+                     <span className='text-lg font-semibold text-charcoal'>Burger<span className='text-orange'>House.</span></span>
                 </Link>
             </div>
             <nav className="flex justify-center">
@@ -17,6 +17,7 @@ export default function Navbar(){
                     { label: 'Home', href: '/' },
                     { label: 'About', href: '/about' },
                     { label: 'Menu', href: '/menu' },
+                    { label: 'dashboard', href: '/dashboard' },
                     ].map(({ label, href }) => (
                     <li key={label}>
                         <Link
