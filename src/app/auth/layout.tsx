@@ -7,7 +7,6 @@ import { ArrowLeft } from "lucide-react";
 export default function layout({ children }: LayoutProps<"/">) {
   return (
     <section className="flex h-screen w-full">
-      {/* Form panel */}
       <div className="flex w-full flex-col bg-cream px-6 pb-6 pt-4 md:w-1/2 lg:px-16">
         <div className="flex items-center justify-between">
           <Link href={"/"} className="flex items-center">
@@ -53,17 +52,6 @@ export default function layout({ children }: LayoutProps<"/">) {
           priority
           aria-hidden="true"
           className="object-cover opacity-[0.55]"
-        />
-
-        {/* Soft glow accents */}
-        <div
-          aria-hidden="true"
-          className="absolute -left-16 top-16 h-72 w-72 rounded-full bg-peach/80 blur-2xl"
-        />
-
-        <div
-          aria-hidden="true"
-          className="absolute bottom-10 right-10 h-80 w-80 rounded-full bg-orange/10 blur-2xl"
         />
       </div>
     </section>

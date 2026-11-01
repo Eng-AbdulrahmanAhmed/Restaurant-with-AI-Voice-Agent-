@@ -56,15 +56,19 @@ export default function Home() {
             spacing around the marquee. (undo: pb-16 pt-10 md:pb-24) */}
         <div className="relative mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-12 px-6 pb-10 pt-10 md:pb-14 lg:grid-cols-2 lg:px-12">
           {/* Text */}
-          <div className="flex flex-col items-start">
+          <div className="flex flex-col items-start bg-cream rounded-full px-4 py-2">
             {/* Badge */}
-            <p className="inline-flex items-center gap-2 rounded-full bg-orange/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-orange-deep">
-              <span className="h-1.5 w-1.5 rounded-full bg-orange" aria-hidden="true" />
-              Fresh · Local · Delicious
-            </p>
+            <div className="inline items-center bg-orange/10 px-4 rounded-full">
+              <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold" aria-hidden="true">Fresh </span>
+              <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold text-lg">· </span>
+              <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold">Local </span>
+              <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold text-lg">· </span>
+              <span className="h-1.5 w-1.5 rounded-full text-orange font-semibold">Delicious</span>
+            </div>
+              
 
             {/* Heading */}
-            <h1 className="mt-6 font-display text-5xl font-black leading-[1.02] tracking-tight text-ink sm:text-6xl xl:text-7xl">
+            <h1 className="mt-3 font-display text-5xl font-black leading-[1.02] tracking-tight text-ink sm:text-6xl xl:text-7xl">
               Burgers made
               <br />
               to make you{" "}
