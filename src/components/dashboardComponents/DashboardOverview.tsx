@@ -1,12 +1,34 @@
+"use client"
 import {
   Utensils,
   TrendingUp,
   PackageX,
   Banknote,
 } from "lucide-react";
+import { useState , useEffect} from "react"
+import { getProducts } from "@/services/productService";
 
 /* REDESIGN — same four stats, restyled with the reference palette:
    soft white cards on cream, tinted icon chips, Fraunces numbers. */
+
+
+export default function DashboardOverview() {
+  
+const [totalProducts, setTotalProducts] = useState(0);
+//getting the total number of menu items from the productService.ts file
+useEffect(() => {
+  async function fetchTotalProductCount(){
+    try{
+      const {totalCount} = await getProducts();
+      setTotalProducts(totalCount);
+    }
+    catch (error){
+      console.error("Error fetching total product count:", error);
+    }
+  }
+  fetchTotalProductCount();
+} , [])
+
 
 const stats = [
   {
@@ -18,7 +40,7 @@ const stats = [
   },
   {
     title: "Total Menu Items",
-    value: "24",
+    value: totalProducts.toString(),
     detail: "Across all categories",
     icon: Utensils,
     iconStyle: "bg-gold/15 text-gold",
@@ -39,7 +61,6 @@ const stats = [
   },
 ];
 
-export default function DashboardOverview() {
   return (
     <section className="mt-6 flex flex-wrap items-center justify-center gap-3">
       {stats.map((stat) => {
