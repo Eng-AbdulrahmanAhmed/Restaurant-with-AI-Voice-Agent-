@@ -17,10 +17,13 @@ import {
   Flame,
   ArrowRight,
   Clock,
+  SearchX,
+  ChevronLeft,
+  ChevronRight,
   Beef,
   Bot,
   Utensils,
-  Sandwich,
+  Hamburger,
   ShoppingBag,
   Coffee,
   IceCream,
@@ -303,6 +306,321 @@ const MENU_PRODUCTS: Product[] = [
     ingredients: ["Fudge Brownie", "Salted Caramel", "Cocoa Dust"],
     aliases: ["brownie", "caramel brownie", "brownie stack"],
   },
+  {
+    id: 18,
+    name: "Smoky Chipotle Ranch Burger",
+    category: "Burgers",
+    description: "Flame-grilled patty, chipotle ranch, pepper jack, crispy onion straws, and toasted brioche.",
+    price: 11.29,
+    image: "",
+    badge: "Smoky Heat",
+    popular: true,
+    calories: "780 kcal",
+    prepTime: "9-11 min",
+    spicy: true,
+    ingredients: ["Chipotle Ranch", "Pepper Jack", "Onion Straws"],
+    aliases: ["chipotle burger", "ranch burger", "smoky burger"],
+  },
+  {
+    id: 19,
+    name: "Avocado Bacon Club Burger",
+    category: "Burgers",
+    description: "Grilled chicken, crispy bacon, fresh avocado, lettuce, tomato, and garlic aioli.",
+    price: 12.49,
+    image: "",
+    badge: "Club Classic",
+    popular: true,
+    calories: "810 kcal",
+    prepTime: "10-12 min",
+    ingredients: ["Grilled Chicken", "Bacon", "Avocado", "Garlic Aioli"],
+    aliases: ["avocado burger", "bacon club", "chicken club"],
+  },
+  {
+    id: 20,
+    name: "BBQ Pulled Pork Burger",
+    category: "Burgers",
+    description: "Slow-smoked pulled pork, tangy BBQ sauce, coleslaw, and pickles on a toasted bun.",
+    price: 10.99,
+    image: "",
+    popular: false,
+    calories: "760 kcal",
+    prepTime: "8-10 min",
+    ingredients: ["Pulled Pork", "BBQ Sauce", "Coleslaw"],
+    aliases: ["pulled pork", "bbq pork", "pork burger"],
+  },
+  {
+    id: 21,
+    name: "Cajun Spiced Lamb Burger",
+    category: "Burgers",
+    description: "Spiced lamb patty, feta, tzatziki, rocket, and roasted red peppers.",
+    price: 13.49,
+    image: "",
+    badge: "New",
+    popular: false,
+    calories: "720 kcal",
+    prepTime: "11-13 min",
+    spicy: true,
+    ingredients: ["Lamb Patty", "Feta", "Tzatziki"],
+    aliases: ["lamb burger", "cajun lamb"],
+  },
+  {
+    id: 22,
+    name: "Truffle Mushroom Melt",
+    category: "Burgers",
+    description: "Beef patty, truffle mayo, sauteed mushrooms, gruyere, and arugula.",
+    price: 12.99,
+    image: "",
+    badge: "Truffle",
+    popular: true,
+    calories: "790 kcal",
+    prepTime: "10-12 min",
+    ingredients: ["Truffle Mayo", "Gruyere", "Mushrooms"],
+    aliases: ["truffle melt", "mushroom melt"],
+  },
+  {
+    id: 23,
+    name: "Crispy Fish Fillet Burger",
+    category: "Burgers",
+    description: "Beer-battered fish fillet, tartar sauce, lettuce, and lemon on a soft bun.",
+    price: 9.99,
+    image: "",
+    popular: false,
+    calories: "650 kcal",
+    prepTime: "9-11 min",
+    ingredients: ["Fish Fillet", "Tartar Sauce", "Lemon"],
+    aliases: ["fish burger", "fish fillet"],
+  },
+  {
+    id: 24,
+    name: "Buffalo Chicken Burger",
+    category: "Burgers",
+    description: "Crispy chicken tossed in buffalo sauce, blue cheese crumbles, and celery slaw.",
+    price: 10.79,
+    image: "",
+    badge: "Buffalo",
+    popular: true,
+    calories: "730 kcal",
+    prepTime: "9-11 min",
+    spicy: true,
+    ingredients: ["Buffalo Sauce", "Blue Cheese", "Celery Slaw"],
+    aliases: ["buffalo chicken", "buffalo burger"],
+  },
+  {
+    id: 25,
+    name: "Garlic Parmesan Fries",
+    category: "Sides",
+    description: "Golden fries tossed in garlic butter and parmesan with a herb finish.",
+    price: 4.99,
+    image: "",
+    popular: true,
+    calories: "420 kcal",
+    prepTime: "5-7 min",
+    ingredients: ["Garlic Butter", "Parmesan", "Herbs"],
+    aliases: ["garlic fries", "parmesan fries"],
+  },
+  {
+    id: 26,
+    name: "Loaded Nacho Fries",
+    category: "Sides",
+    description: "Fries loaded with cheese sauce, jalapenos, sour cream, and pico de gallo.",
+    price: 6.49,
+    image: "",
+    badge: "Loaded",
+    popular: true,
+    calories: "560 kcal",
+    prepTime: "6-8 min",
+    spicy: true,
+    ingredients: ["Cheese Sauce", "Jalapenos", "Pico de Gallo"],
+    aliases: ["nacho fries", "loaded fries"],
+  },
+  {
+    id: 27,
+    name: "Sweet Potato Fries",
+    category: "Sides",
+    description: "Crispy sweet potato fries with a smoky chipotle dip.",
+    price: 4.29,
+    image: "",
+    popular: false,
+    calories: "380 kcal",
+    prepTime: "5-7 min",
+    ingredients: ["Sweet Potato", "Chipotle Dip"],
+    aliases: ["sweet potato", "sweet fries"],
+  },
+  {
+    id: 28,
+    name: "Mozzarella Sticks",
+    category: "Sides",
+    description: "Golden fried mozzarella sticks with marinara dipping sauce.",
+    price: 5.49,
+    image: "",
+    badge: "Cheesy",
+    popular: true,
+    calories: "450 kcal",
+    prepTime: "5-7 min",
+    ingredients: ["Mozzarella", "Marinara"],
+    aliases: ["mozzarella sticks", "cheese sticks"],
+  },
+  {
+    id: 29,
+    name: "Coleslaw Cup",
+    category: "Sides",
+    description: "Creamy house coleslaw with a hint of apple cider vinegar.",
+    price: 2.49,
+    image: "",
+    popular: false,
+    calories: "180 kcal",
+    prepTime: "2 min",
+    ingredients: ["Cabbage", "Carrot", "Creamy Dressing"],
+    aliases: ["coleslaw", "slaw"],
+  },
+  {
+    id: 30,
+    name: "Garden Side Salad",
+    category: "Sides",
+    description: "Mixed greens, cherry tomatoes, cucumber, and balsamic vinaigrette.",
+    price: 3.99,
+    image: "",
+    popular: false,
+    calories: "120 kcal",
+    prepTime: "3 min",
+    ingredients: ["Mixed Greens", "Cherry Tomato", "Cucumber"],
+    aliases: ["side salad", "garden salad"],
+  },
+  {
+    id: 31,
+    name: "Mango Passion Smoothie",
+    category: "Drinks",
+    description: "Blended mango and passion fruit with yogurt and honey.",
+    price: 4.79,
+    image: "",
+    badge: "Tropical",
+    popular: true,
+    calories: "210 kcal",
+    prepTime: "2 min",
+    ingredients: ["Mango", "Passion Fruit", "Yogurt"],
+    aliases: ["mango smoothie", "passion smoothie"],
+  },
+  {
+    id: 32,
+    name: "Iced Vanilla Latte",
+    category: "Drinks",
+    description: "Cold espresso with vanilla syrup and milk over ice.",
+    price: 3.99,
+    image: "",
+    popular: true,
+    calories: "180 kcal",
+    prepTime: "2 min",
+    ingredients: ["Espresso", "Vanilla Syrup", "Milk"],
+    aliases: ["vanilla latte", "iced latte"],
+  },
+  {
+    id: 33,
+    name: "Peach Iced Tea",
+    category: "Drinks",
+    description: "Brewed black tea with peach syrup poured over crushed ice.",
+    price: 3.29,
+    image: "",
+    popular: false,
+    calories: "95 kcal",
+    prepTime: "2 min",
+    ingredients: ["Black Tea", "Peach Syrup"],
+    aliases: ["peach tea", "iced tea"],
+  },
+  {
+    id: 34,
+    name: "Chocolate Peanut Butter Shake",
+    category: "Drinks",
+    description: "Rich chocolate and peanut butter blended thick with vanilla ice cream.",
+    price: 5.29,
+    image: "",
+    badge: "Indulgent",
+    popular: true,
+    calories: "520 kcal",
+    prepTime: "3 min",
+    ingredients: ["Chocolate", "Peanut Butter", "Vanilla Ice Cream"],
+    aliases: ["chocolate shake", "peanut butter shake"],
+  },
+  {
+    id: 35,
+    name: "Fresh Orange Juice",
+    category: "Drinks",
+    description: "Freshly squeezed oranges served chilled over ice.",
+    price: 3.49,
+    image: "",
+    popular: false,
+    calories: "110 kcal",
+    prepTime: "2 min",
+    ingredients: ["Fresh Oranges"],
+    aliases: ["orange juice", "fresh juice"],
+  },
+  {
+    id: 36,
+    name: "New York Cheesecake Slice",
+    category: "Desserts",
+    description: "Creamy cheesecake with a graham cracker crust and berry compote.",
+    price: 5.49,
+    image: "",
+    badge: "Classic",
+    popular: true,
+    calories: "480 kcal",
+    prepTime: "3 min",
+    ingredients: ["Cream Cheese", "Graham Crust", "Berry Compote"],
+    aliases: ["cheesecake", "ny cheesecake"],
+  },
+  {
+    id: 37,
+    name: "Apple Pie with Cinnamon",
+    category: "Desserts",
+    description: "Warm apple pie spiced with cinnamon and a scoop of vanilla ice cream.",
+    price: 4.99,
+    image: "",
+    popular: true,
+    calories: "430 kcal",
+    prepTime: "4-6 min",
+    ingredients: ["Apples", "Cinnamon", "Vanilla Ice Cream"],
+    aliases: ["apple pie", "pie"],
+  },
+  {
+    id: 38,
+    name: "Tiramisu Cup",
+    category: "Desserts",
+    description: "Coffee-soaked ladyfingers layered with silky mascarpone cream.",
+    price: 5.99,
+    image: "",
+    badge: "Italian",
+    popular: false,
+    calories: "410 kcal",
+    prepTime: "3 min",
+    ingredients: ["Ladyfingers", "Mascarpone", "Espresso"],
+    aliases: ["tiramisu", "tiramisu cup"],
+  },
+  {
+    id: 39,
+    name: "Strawberry Shortcake",
+    category: "Desserts",
+    description: "Fluffy sponge cake layered with fresh strawberries and whipped cream.",
+    price: 4.79,
+    image: "",
+    popular: true,
+    calories: "390 kcal",
+    prepTime: "3 min",
+    ingredients: ["Sponge Cake", "Strawberries", "Whipped Cream"],
+    aliases: ["shortcake", "strawberry cake"],
+  },
+  {
+    id: 40,
+    name: "Chocolate Lava Cake",
+    category: "Desserts",
+    description: "Warm chocolate cake with a molten center, served with ice cream.",
+    price: 5.99,
+    image: "",
+    badge: "Lava",
+    popular: true,
+    calories: "520 kcal",
+    prepTime: "6-8 min",
+    ingredients: ["Dark Chocolate", "Vanilla Ice Cream"],
+    aliases: ["lava cake", "chocolate lava"],
+  },
 ];
 
 /* Shared artwork resolver — exactly the dashboard catalog's mapping:
@@ -327,7 +645,7 @@ MENU_PRODUCTS.forEach((p) => {
 
 const CATEGORIES = [
   { label: "All Items", icon: Utensils },
-  { label: "Burgers", icon: Sandwich },
+  { label: "Burgers", icon: Hamburger },
   { label: "Sides", icon: ShoppingBag },
   { label: "Drinks", icon: Coffee },
   { label: "Desserts", icon: IceCream },
@@ -370,9 +688,11 @@ export default function CustomerMenuPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dietaryFilter, setDietaryFilter] = useState<"all" | "popular" | "spicy">("all");
   const [orderType, setOrderType] = useState<"dine-in" | "takeout">("dine-in");
+  const [currentPage, setCurrentPage] = useState(1);
 
   // AI popup state — console mounts once, toggles visibility
   const [aiOpen, setAiOpen] = useState(false);
+  const [trayOpen, setTrayOpen] = useState(false);
 
   // Cart State
   const [cart, setCart] = useState<{ product: Product; quantity: number }[]>([]);
@@ -567,6 +887,17 @@ export default function CustomerMenuPage() {
     });
   }, [activeCategory, searchQuery, dietaryFilter]);
 
+  // Pagination: 9 smaller cards per page
+  const ITEMS_PER_PAGE = 9;
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, searchQuery, dietaryFilter]);
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
+
   return (
     <div className="min-h-screen bg-cream text-ink selection:bg-orange selection:text-cream">
       {/* =====================================================================
@@ -615,15 +946,9 @@ export default function CustomerMenuPage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-1.5 text-xs font-bold text-brown sm:flex">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-lettuce" />
-              Kitchen Live
-            </div>
             <button
-              onClick={() => {
-                document.getElementById("order-tray")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="relative flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2.5 shadow-sm transition hover:border-orange lg:hidden"
+              onClick={() => setTrayOpen((v) => !v)}
+              className="relative flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2.5 shadow-sm transition hover:border-orange"
             >
               <ShoppingCart size={18} className="text-orange" />
               <span className="text-xs font-bold">{totalItemCount}</span>
@@ -633,218 +958,219 @@ export default function CustomerMenuPage() {
       </header>
 
       {/* =====================================================================
-          SECTION 3 — STATS STRIP (DashboardOverview card anatomy)
+          SECTION 3 — COMPACT HERO BAR (animated gradient, blobs, burger art)
       ===================================================================== */}
-      <section className="border-b border-ink/10 bg-cream-deep/40 py-6">
-        <div className="mx-auto max-w-[1500px] px-6 lg:px-10">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:gap-5">
-            {RESTAURANT_STATS.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <div
-                  key={stat.label}
-                  className="flex items-center gap-3.5 rounded-2xl border border-ink/10 bg-white p-3.5 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_32px_-22px_rgba(36,23,8,0.45)]"
-                >
-                  <div
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${stat.color}`}
+      <section className="relative overflow-hidden border-b border-ink/10 bg-cream-deep/40 py-7">
+        {/* animated gradient wash + drifting blobs */}
+        <div className="animate-gradient-x absolute inset-0 bg-[linear-gradient(115deg,transparent_0%,rgba(242,105,13,0.12)_38%,transparent_65%,rgba(36,23,8,0.05)_100%)]" />
+        <div className="animate-blob absolute -left-16 -top-20 h-64 w-64 rounded-full bg-orange/15 blur-3xl" />
+        <div className="animate-blob animation-delay-2000 absolute right-32 top-10 h-56 w-56 rounded-full bg-tomato/10 blur-3xl" />
+        <div className="animate-blob animation-delay-4000 absolute bottom-[-3rem] left-1/3 h-48 w-48 rounded-full bg-gold/15 blur-3xl" />
+
+        <div className="relative mx-auto grid max-w-[1500px] grid-cols-[1fr_auto] items-center gap-6 px-6 lg:px-10">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-orange-deep shadow-sm">
+              <Flame size={12} />
+              Flame-Seared Daily
+            </span>
+            <h1 className="mt-2.5 font-display text-2xl font-black tracking-tight text-ink sm:text-3xl xl:text-4xl">
+              Order Our{" "}
+              <span className="animate-gradient-x bg-[linear-gradient(90deg,var(--color-orange-deep),var(--color-gold),var(--color-tomato))] bg-clip-text text-transparent italic">
+                Artisan Menu
+              </span>
+            </h1>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {RESTAURANT_STATS.map((stat) => {
+                const Icon = stat.icon;
+                return (
+                  <span
+                    key={stat.label}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-white/80 px-3 py-1.5 text-[11px] font-semibold text-brown shadow-sm backdrop-blur-sm"
                   >
-                    <Icon size={20} strokeWidth={2.2} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-[11px] font-semibold uppercase tracking-wider text-brown/70">
-                      {stat.label}
-                    </p>
-                    <h4 className="truncate font-display text-base font-bold text-ink">
-                      {stat.value}
-                    </h4>
-                    <p className="truncate text-[10px] text-brown/50">
-                      {stat.sub}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+                    <Icon size={13} className="text-orange" />
+                    {stat.label}
+                    <strong className="font-display font-bold text-ink">{stat.value}</strong>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* floating burger art */}
+          <div className="relative hidden h-36 w-36 shrink-0 sm:block lg:h-40 lg:w-40">
+            <div className="animate-spin-slow absolute inset-0 rounded-full border-2 border-dashed border-orange/30" />
+            <div className="animate-float relative h-full w-full">
+              <img
+                src={heroImage.src}
+                alt="Signature flame-grilled burger"
+                className="h-full w-full rounded-full object-cover shadow-[0_18px_36px_-14px_rgba(36,23,8,0.45)]"
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Main 2-column layout: menu grid + sticky order tray */}
+      {/* Main layout: left filter rail + center product grid */}
       <div className="mx-auto max-w-[1500px] px-6 py-10 lg:px-10">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 xl:gap-10">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* ===============================================================
-              SECTION 4 — MENU COLUMN
+              SECTION 4 — LEFT RAIL (search, categories, dietary filters)
           ================================================================ */}
-          <div className="lg:col-span-8">
-            {/* Header — landing heading pattern */}
-            <div className="mb-7">
-              <span className="inline-flex items-center gap-2 rounded-full bg-orange/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-orange-deep">
-                <Flame size={13} />
-                Fresh • Flame-Seared Daily
-              </span>
-              <h1 className="mt-3 font-display text-3xl font-black tracking-tight text-ink sm:text-4xl xl:text-5xl">
-                Order Our <span className="italic text-orange">Artisan Menu</span>
-              </h1>
-              <p className="mt-2 max-w-xl text-sm leading-relaxed text-brown">
-                Hand-pressed 180g patties, seared over glowing coals. Hit the
-                GrillBot button to order with your voice, hands-free.
-              </p>
-            </div>
-
-            {/* Sub-section 4a — Search & category bar (catalog header pattern) */}
-            <div className="mb-6 rounded-[1.75rem] border border-ink/10 bg-white p-2.5 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)]">
-              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {CATEGORIES.map(({ label, icon: Icon }) => {
-                    const active = activeCategory === label;
-                    return (
-                      <button
-                        key={label}
-                        type="button"
-                        onClick={() => setActiveCategory(label)}
-                        className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold transition-all duration-200 ${
-                          active
-                            ? "bg-ink text-cream shadow-[0_8px_18px_-8px_rgba(36,23,8,0.6)]"
-                            : "text-ink/70 hover:bg-orange/10 hover:text-orange"
-                        }`}
-                      >
-                        <Icon size={16} />
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="relative w-full shrink-0 md:w-64">
-                  <Search
-                    size={16}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-brown/50"
-                  />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search dishes or buns..."
-                    className="h-10 w-full rounded-full border border-ink/10 bg-cream pl-9 pr-8 text-xs font-medium text-ink outline-none transition placeholder:text-brown/50 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
-                  />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => setSearchQuery("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-brown/50 hover:text-ink"
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
-                </div>
+          <aside className="lg:col-span-3">
+            <div className="sticky top-24 rounded-[1.75rem] border border-ink/10 bg-white p-4 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)]">
+              {/* Search input */}
+              <div className="relative">
+                <Search
+                  size={16}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-brown/50"
+                />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search dishes or buns..."
+                  className="h-10 w-full rounded-full border border-ink/10 bg-cream pl-9 pr-8 text-xs font-medium text-ink outline-none transition placeholder:text-brown/50 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-brown/50 hover:text-ink"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
               </div>
 
-              {/* Dietary filter row */}
-              <div className="mt-2.5 flex items-center justify-between border-t border-ink/10 px-2 pt-2.5">
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="font-semibold text-brown">Filter:</span>
-                  {(
-                    [
-                      { key: "all", label: "All items" },
-                      { key: "popular", label: "⭐ Bestsellers" },
-                      { key: "spicy", label: "🌶️ Spicy Picks" },
-                    ] as const
-                  ).map(({ key, label }) => (
+              {/* Category list with count badges */}
+              <div className="mt-4 space-y-1">
+                {CATEGORIES.map(({ label, icon: Icon }) => {
+                  const active = activeCategory === label;
+                  const count =
+                    label === "All Items"
+                      ? MENU_PRODUCTS.length
+                      : MENU_PRODUCTS.filter((p) => p.category === label).length;
+                  return (
                     <button
-                      key={key}
-                      onClick={() => setDietaryFilter(key)}
-                      className={`rounded-full px-2.5 py-1 font-bold transition-colors ${
-                        dietaryFilter === key
-                          ? "bg-orange/10 text-orange-deep"
-                          : "text-brown hover:text-ink"
+                      key={label}
+                      type="button"
+                      onClick={() => setActiveCategory(label)}
+                      className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all duration-200 ${
+                        active
+                          ? "bg-ink text-cream shadow-[0_8px_18px_-8px_rgba(36,23,8,0.6)]"
+                          : "text-ink/70 hover:bg-orange/10 hover:text-orange"
                       }`}
                     >
-                      {label}
+                      <Icon size={16} />
+                      <span className="flex-1 text-left">{label}</span>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                          active ? "bg-cream/20 text-cream" : "bg-cream-deep text-brown"
+                        }`}
+                      >
+                        {count}
+                      </span>
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
+              </div>
 
-                <span className="text-xs font-semibold text-brown/80">
-                  {filteredProducts.length} options
-                </span>
+              {/* Dietary filter pills */}
+              <div className="mt-4 flex items-center gap-1.5 border-t border-ink/10 pt-3.5">
+                {(
+                  [
+                    { key: "all", label: "All items", icon: Utensils },
+                    { key: "popular", label: "Bestsellers", icon: Star },
+                    { key: "spicy", label: "Spicy", icon: Flame },
+                  ] as const
+                ).map(({ key, label, icon: Icon }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setDietaryFilter(key)}
+                    className={`flex h-8 flex-1 items-center justify-center gap-1 rounded-full text-[11px] font-bold transition-all duration-200 ${
+                      dietaryFilter === key
+                        ? "bg-orange text-cream shadow-[0_8px_18px_-8px_rgba(242,105,13,0.7)]"
+                        : "bg-cream text-brown hover:bg-orange/10 hover:text-orange"
+                    }`}
+                    title={label}
+                  >
+                    <Icon size={13} />
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
+          </aside>
 
-            {/* Sub-section 4b — Product grid (MenuCatalogGrid card anatomy:
-                photo left in a cream-deep well, Fraunces title, orange price,
-                divider, action footer) */}
+          {/* ===============================================================
+              SECTION 5 — CENTER PRODUCT GRID
+          ================================================================ */}
+          <div className="lg:col-span-9">
+
+            {/* Sub-section 5a — Product grid (photo-top cards, 3 per row) */}
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                {filteredProducts.map((product) => {
+              <div className="grid grid-cols-2 gap-3.5 md:grid-cols-3">
+                {paginatedProducts.map((product) => {
                   const cartEntry = cart.find((i) => i.product.id === product.id);
                   const qty = cartEntry ? cartEntry.quantity : 0;
 
                   return (
                     <article
                       key={product.id}
-                      className="flex flex-col rounded-[1.75rem] border border-ink/10 bg-white p-5 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_32px_-22px_rgba(36,23,8,0.45)]"
+                      className="group flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-3 shadow-[0_10px_24px_-18px_rgba(36,23,8,0.4)] transition-all hover:-translate-y-0.5 hover:border-orange/40 hover:shadow-[0_16px_28px_-18px_rgba(36,23,8,0.5)]"
                     >
-                      {/* Badges row */}
-                      <div className="mb-4 flex items-center justify-between">
-                        <span className="rounded-full bg-orange/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-orange-deep">
-                          {product.category}
-                        </span>
-                        {product.badge && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-gold/20 px-3 py-1 text-[11px] font-bold text-gold">
-                            <Star size={11} fill="currentColor" strokeWidth={0} />
-                            {product.badge}
+                      {/* Photo top */}
+                      <div className="relative h-44 w-full shrink-0 overflow-hidden rounded-xl bg-cream-deep">
+                        {product.popular && (
+                          <span
+                            title="Bestseller"
+                            className="absolute left-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-gold/25 text-gold shadow-sm"
+                          >
+                            <Star size={12} fill="currentColor" strokeWidth={0} />
                           </span>
                         )}
-                      </div>
-
-                      {/* Photo left + info right */}
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-cream-deep">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="h-full w-full object-contain p-1.5 drop-shadow-[0_10px_12px_rgba(36,23,8,0.18)] transition-transform duration-300 group-hover:scale-105"
-                          />
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <h3 className="truncate font-display text-lg font-bold text-ink">
-                            {product.name}
-                            {product.spicy && (
-                              <span title="Spicy dish" className="ml-1.5 text-sm align-middle">
-                                🌶️
-                              </span>
-                            )}
-                          </h3>
-                          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-brown">
-                            {product.description}
-                          </p>
-                          <p className="mt-2 font-display text-xl font-bold text-orange">
-                            ${product.price.toFixed(2)}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Ingredient + meta chips */}
-                      <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                        {product.ingredients.slice(0, 3).map((ing) => (
+                        {product.spicy && (
                           <span
-                            key={ing}
-                            className="rounded-md border border-ink/5 bg-cream px-2 py-0.5 text-[10px] font-medium text-brown"
+                            title="Spicy dish"
+                            className="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-tomato/15 text-tomato shadow-sm"
                           >
-                            {ing}
+                            <Flame size={12} />
                           </span>
-                        ))}
-                        <span className="ml-auto flex items-center gap-1 rounded-md bg-cream px-2 py-0.5 text-[10px] font-semibold text-brown/80">
+                        )}
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-full w-full object-contain p-2 transition-transform duration-300 group-hover:scale-105"
+                        />
+                      </div>
+
+                      {/* Info */}
+                      <div className="mt-2.5 flex min-w-0 flex-1 flex-col">
+                        <span className="text-[9px] font-extrabold uppercase tracking-wider text-orange-deep">
+                          {product.category}
+                        </span>
+                        <h3 className="mt-0.5 truncate font-display text-sm font-bold text-ink">
+                          {product.name}
+                        </h3>
+                        <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-brown">
+                          {product.description}
+                        </p>
+                        <p className="mt-1.5 font-display text-base font-bold text-orange">
+                          ${product.price.toFixed(2)}
+                        </p>
+                      </div>
+
+                      {/* Meta chips + action footer (catalog toolbar pattern) */}
+                      <div className="mt-2 flex flex-wrap items-center gap-1">
+                        <span className="flex items-center gap-1 rounded-md bg-cream px-2 py-0.5 text-[10px] font-semibold text-brown/80">
                           <Beef size={10} /> {product.calories}
                         </span>
                         <span className="flex items-center gap-1 rounded-md bg-cream px-2 py-0.5 text-[10px] font-semibold text-brown/80">
                           <Clock size={10} /> {product.prepTime}
                         </span>
                       </div>
-
-                      {/* Divider + action footer (catalog toolbar pattern) */}
-                      <hr className="my-4 border-ink/10" />
-                      <div className="mt-auto flex items-center justify-between">
+                      <div className="mt-auto flex items-center justify-between pt-2.5">
                         {qty === 0 ? (
                           <button
                             type="button"
@@ -888,7 +1214,9 @@ export default function CustomerMenuPage() {
               </div>
             ) : (
               <div className="rounded-2xl border border-dashed border-ink/15 bg-white/60 p-12 text-center">
-                <span className="text-4xl">🍳</span>
+                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-orange/10 text-orange">
+                  <SearchX size={26} strokeWidth={2.2} />
+                </span>
                 <h3 className="mt-3 font-display text-lg font-bold text-ink">
                   No dishes matched your criteria
                 </h3>
@@ -897,15 +1225,64 @@ export default function CustomerMenuPage() {
                 </p>
               </div>
             )}
+
+            {/* Pagination */}
+            {filteredProducts.length > ITEMS_PER_PAGE && (
+              <div className="mt-6 flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  aria-label="Previous page"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-ink/10 bg-white text-brown transition-colors hover:border-orange hover:text-orange disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <ChevronLeft size={14} />
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    onClick={() => setCurrentPage(page)}
+                    className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-200 ${
+                      page === currentPage
+                        ? "bg-ink text-cream shadow-[0_4px_12px_-4px_rgba(36,23,8,0.4)]"
+                        : "border border-ink/10 bg-white text-brown hover:border-orange hover:text-orange"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  aria-label="Next page"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-ink/10 bg-white text-brown transition-colors hover:border-orange hover:text-orange disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
+            {filteredProducts.length > 0 && (
+              <p className="mt-2 text-center text-[11px] text-brown/60">
+                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-
+                {Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)} of{" "}
+                {filteredProducts.length} dishes
+              </p>
+            )}
           </div>
 
           {/* ===============================================================
-              SECTION 5 — ORDER TRAY (was sharing the rail with the AI
-              console; the console moved to a floating popup)
+              SECTION 6 — ORDER TRAY POPUP (opened from the navbar cart
+              button; ALWAYS MOUNTED, only visually hidden)
           ================================================================ */}
-          <aside id="order-tray" className="lg:col-span-4">
-            <div className="sticky top-24">
-              <div className="rounded-[2rem] border border-ink/10 bg-white p-5 shadow-[0_18px_40px_-20px_rgba(36,23,8,0.25)]">
+          <div
+            className={`fixed top-[84px] right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)]
+                        overflow-hidden rounded-[2rem] border border-ink/10 bg-white
+                        shadow-[0_24px_60px_-24px_rgba(36,23,8,0.45)] transition-all duration-300
+                        ${trayOpen ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-4 opacity-0"}`}
+          >
+            <div className="p-5">
                 {/* Header + order type toggle */}
                 <div className="flex items-center justify-between border-b border-ink/10 pb-3.5">
                   <div className="flex items-center gap-2">
@@ -939,6 +1316,15 @@ export default function CustomerMenuPage() {
                       Takeout
                     </button>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setTrayOpen(false)}
+                    aria-label="Close order tray"
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-brown/60 transition hover:bg-cream hover:text-ink"
+                  >
+                    <X size={14} />
+                  </button>
                 </div>
 
                 {/* Items list */}
@@ -1033,7 +1419,6 @@ export default function CustomerMenuPage() {
                 </button>
               </div>
             </div>
-          </aside>
         </div>
       </div>
 
@@ -1051,6 +1436,21 @@ export default function CustomerMenuPage() {
         aria-label="Open AI voice ordering console"
         className="group fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-ink text-cream shadow-[0_14px_28px_-10px_rgba(36,23,8,0.6)] transition-all hover:-translate-y-0.5 hover:bg-orange motion-reduce:hover:translate-y-0"
       >
+        {/* Hover info popup — only while the console is closed */}
+        {!aiOpen && (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute bottom-full right-0 mb-3 w-56 translate-y-2 rounded-2xl border border-ink/10 bg-white p-3 text-left opacity-0 shadow-[0_18px_40px_-16px_rgba(36,23,8,0.45)] transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100"
+          >
+            <span className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-orange-deep">
+              <Bot size={13} />
+              AI Voice GrillBot
+            </span>
+            <span className="mt-1 block text-[11px] leading-relaxed text-brown">
+              Say your order with your voice - hands-free.
+            </span>
+          </span>
+        )}
         {isListening && !aiOpen && (
           <span className="absolute -inset-2 animate-ping rounded-full bg-orange/30" />
         )}
@@ -1215,3 +1615,4 @@ export default function CustomerMenuPage() {
     </div>
   );
 }
+

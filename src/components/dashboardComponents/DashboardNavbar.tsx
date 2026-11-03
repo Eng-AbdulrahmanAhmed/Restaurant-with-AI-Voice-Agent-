@@ -9,6 +9,7 @@ import {
     ChartNoAxesCombined,
     LogOut
 } from "lucide-react";
+import { useAddItem } from "./AddItemContext";
 
 import burgerLogo from "@/assets/logo-no-background.png";
 
@@ -24,6 +25,7 @@ const navLinks = [
 
 export default function DashboardNavbar() {
     const pathname = usePathname();
+    const { openAddItem, close } = useAddItem();
 
     const isActive = (href: string) => {
         if (href === "/dashboard") {
@@ -34,6 +36,7 @@ export default function DashboardNavbar() {
     };
 
     return (
+        <>
         <header className="
             sticky top-0 z-40
             grid grid-cols-[1fr_auto_1fr]
@@ -106,8 +109,9 @@ export default function DashboardNavbar() {
             {/* Actions */}
             <div className="flex items-center justify-end gap-5">
 
-                <Link
-                    href="/dashboard/new"
+                <button
+                    type="button"
+                    onClick={openAddItem}
                     className="
                         flex h-[42px] items-center justify-center
                         rounded-full
@@ -125,7 +129,7 @@ export default function DashboardNavbar() {
                     "
                 >
                     + Add New Item
-                </Link>
+                </button>
 
                 <span className="h-7 w-px bg-ink/10" />
 
@@ -152,5 +156,6 @@ export default function DashboardNavbar() {
 
             </div>
         </header>
+        </>
     );
 }

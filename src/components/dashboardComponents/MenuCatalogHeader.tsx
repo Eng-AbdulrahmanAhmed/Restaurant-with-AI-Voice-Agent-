@@ -20,7 +20,7 @@
       commented block — uncomment it, delete the new one, done)
    ============================================================================ */
 
-import { Utensils, Search, LayoutGrid } from "lucide-react";
+import { Utensils, Search, LayoutGrid, Hamburger, Salad, CupSoda, IceCreamBowl } from "lucide-react";
 import Image from "next/image";
 import type { StaticImageData } from "next/image";
 
@@ -39,10 +39,10 @@ type Category = {
 
 const categories: Category[] = [
   { label: "All Items", lucideIcon: LayoutGrid }, // STYLE MOD — same icon as navbar "Menu Items"
-  { label: "Burgers", icon: burgerIcon },
-  { label: "Sides", icon: friesIcon },
-  { label: "Drinks", icon: cupIcon },
-  { label: "Desserts", icon: cupcakeIcon },
+  { label: "Burgers", lucideIcon: Hamburger },
+  { label: "Sides", lucideIcon: Salad },
+  { label: "Drinks", lucideIcon: CupSoda },
+  { label: "Desserts", lucideIcon: IceCreamBowl },
 ];
 
 /* ===================== OLD (v1 — with search wiring) =====================
@@ -240,6 +240,7 @@ export default function MenuCatalogHeader({
           />
           ========================================================== */}
         </div>
+
       </div>
     </section>
   );

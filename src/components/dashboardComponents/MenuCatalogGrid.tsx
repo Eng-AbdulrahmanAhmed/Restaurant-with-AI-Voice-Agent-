@@ -3,6 +3,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { useAddItem } from "./AddItemContext";
 import {
   Pencil,
   ChevronRight,
@@ -20,6 +21,7 @@ export type MenuItem = {
   image: string | null;
   stock?: number | null;
   popular?: boolean;
+  spicy?: boolean;
 };
 
 type Props = {
@@ -71,6 +73,7 @@ export default function MenuCatalogGrid({
   totalPages,
   onPageChange,
 }: Props) {
+  const { openEditItem } = useAddItem();
   return (
     <div className="mb-8 space-y-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -168,6 +171,7 @@ export default function MenuCatalogGrid({
                   <button
                     type="button"
                     title={`Edit ${item.name}`}
+                    onClick={() => openEditItem(item)}
                     className="flex h-8 w-8 items-center justify-center rounded-lg
                                text-brown/50 transition-colors duration-200
                                hover:bg-orange/10 hover:text-orange"
