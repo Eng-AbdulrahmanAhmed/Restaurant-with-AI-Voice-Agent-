@@ -28,3 +28,9 @@ next-env.d.ts
 
 # local backups kept for undoing changes
 *.bak
+
+# Local product images
+/products/
+
+# Local scripts
+/scripts/
