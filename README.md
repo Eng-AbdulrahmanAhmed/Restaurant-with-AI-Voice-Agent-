@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Restaurant POS with AI Voice Ordering 🍔
 
-## Getting Started
+An ongoing project exploring modern restaurant management and AI-powered ordering experiences, built with **Next.js, Supabase, and voice AI integration**.
 
-First, run the development server:
+The goal is to bring together a customer-facing digital menu, an administrative dashboard, and an AI-powered voice ordering assistant into one application.
+
+This project is actively under development, with new features, improvements, and refinements being introduced as development progresses.
+
+## 🚀 Live Preview
+
+**[Visit the application](https://restaurant-with-ai.netlify.app/)**
+
+*Note: The deployed version may not always reflect the latest development changes.*
+
+## ✨ Project Features
+
+### 🛒 Customer Experience
+- Browse the restaurant menu and explore available products.
+- View product descriptions, prices, and images.
+- Filter products by category.
+- Responsive interface for desktop and mobile devices.
+- AI-powered assistant concept for a more interactive ordering experience.
+
+### 🤖 AI Voice Ordering
+- Voice-based interaction with an AI ordering assistant.
+- Conversational menu navigation.
+- Exploring ways to make the ordering process more natural and intuitive.
+
+### 📊 Admin Dashboard
+- Dedicated administrative interface.
+- Manage menu products and categories.
+- Add and edit product information.
+- Manage product availability.
+- Role-based access and authentication.
+
+### 🗄️ Backend & Database
+- Supabase PostgreSQL for application data.
+- Supabase Storage for product images.
+- Supabase authentication for user management.
+
+## 🛠️ Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Next.js | Application framework |
+| React | User interface |
+| TypeScript | Type safety |
+| Tailwind CSS | Styling and responsive design |
+| Supabase | Database, authentication, and storage |
+| Lucide React | Icons |
+| AI & Voice Integration | Conversational ordering experience |
+
+## ⚙️ Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd restaurant_with_ai
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure environment variables
+
+Create a `.env.local` file in the project root:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+Add any additional environment variables required by the AI and voice integrations.
+
+**Important:** Never commit `.env.local` or expose your Supabase service role key in client-side code.
+
+### 4. Start the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```text
+restaurant_with_ai/
+├── public/              # Static assets
+├── src/
+│   ├── app/             # Next.js application routes
+│   ├── components/      # Reusable UI components
+│   ├── lib/             # Shared utilities and configuration
+│   └── services/        # Data fetching and application services
+├── package.json
+└── package-lock.json
+```
 
-## Learn More
+## 🌐 Deployment
 
-To learn more about Next.js, take a look at the following resources:
+A live preview is available on Netlify:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**[https://restaurant-with-ai.netlify.app/](https://restaurant-with-ai.netlify.app/)**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔧 Development Status
 
-## Deploy on Vercel
+This project is currently a work in progress.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Development is ongoing, with additional functionality, UI refinements, backend improvements, and AI integration planned and being implemented.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The current version represents an evolving stage of the application rather than its final release.
+
+---
+
+**Built with Next.js, Supabase, and AI.**
