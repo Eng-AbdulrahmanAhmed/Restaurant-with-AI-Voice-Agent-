@@ -41,7 +41,6 @@ export default function DashboardNavbar() {
             h-[76px]
             px-6 lg:px-10
             bg-cream/90
-
             backdrop-blur-md
         ">
 
