@@ -5,7 +5,7 @@
    lives in DashboardNavbar, which owns the open/close toggle. */
 
 import { Plus, X, ImagePlus } from "lucide-react";
-import type { MenuItem } from "./MenuCatalogGrid";
+import type { MenuItem } from "@/types/types";
 
 type Props = {
     open: boolean;
