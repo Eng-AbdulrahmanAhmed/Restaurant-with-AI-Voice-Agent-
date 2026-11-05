@@ -2,22 +2,60 @@
 
 import { MAX_PRODUCT_PER_PAGE } from "@/Consts";
 import { getProducts } from "@/services/productService";
-import MenuCatalogGrid from "@/components/dashboardComponents/MenuCatalogGrid";
+import MenuCatalogGrid from "@/components/menuComponents/MenuCatalogGrid";
 import { useState, useEffect } from "react";
 import { type MenuItem } from "@/types/types";
-import MenuCatalogHeader from "@/components/dashboardComponents/MenuCatalogHeader";
+import MenuCatalogHeader from "@/components/menuComponents/MenuCatalogHeader";
 import PaginationControls from "./pagination/paginationControls";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
-export default function ProductsBrowser({ page }: { page: number }) {
-  const [activeCategory, setActiveCategory] = useState("All Items");
+export default function ProductsBrowser({ page , search , category }: { page: number , search:string , category:string }) {
+  // const [activeCategory, setActiveCategory] = useState("All Items");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [products, setProducts] = useState<MenuItem[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [searchInput, setSearchInput] = useState(search || "");
+  
+  const pathname = usePathname()
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
   function handleCategoryChange(category: string) {
-    setActiveCategory(category);
-  }
+
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (category === "All Items") {
+        params.delete("category");
+    } else {
+        params.set("category", category);
+    }
+
+    params.set("page", "1");
+
+    router.push(`${pathname}?${params.toString()}`);
+  } 
+
+  // const [searchInput, setSearchInput] = useState(search || "");
+
+useEffect(() => {
+  const timeout = setTimeout(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (searchInput.trim()) {
+      params.set("search", searchInput.trim());
+    } else {
+      params.delete("search");
+    }
+
+    params.set("page", "1");
+
+    router.replace(`${pathname}?${params.toString()}`);
+  }, 300);
+
+  return () => clearTimeout(timeout);
+}, [searchInput]);
+
 
   const totalPages = Math.max(1, Math.ceil(totalCount / MAX_PRODUCT_PER_PAGE));
   const safePage = Math.min(Math.max(1, page), totalPages);
@@ -30,6 +68,8 @@ export default function ProductsBrowser({ page }: { page: number }) {
         const { products, totalCount } = await getProducts({
           page,
           MAX_PRODUCT_PER_PAGE,
+          search,
+          category
         });
         setTotalCount(totalCount);
         setProducts(products);
@@ -42,13 +82,15 @@ export default function ProductsBrowser({ page }: { page: number }) {
     }
 
     fetchProducts();
-  }, [page]);
+  }, [page , category , search]);
 
   return (
     <section className="space-y-7 px-6 pt-10 pb-12 lg:px-10">
       <MenuCatalogHeader
-      activeCategory={activeCategory}
-      onCategoryChange={handleCategoryChange}
+        activeCategory={category || "All Items"}
+        onCategoryChange={handleCategoryChange}
+        search={searchInput}
+        onSearchChange={setSearchInput} 
       />
 
       {loading ? (
@@ -94,7 +136,7 @@ export default function ProductsBrowser({ page }: { page: number }) {
       ) : (
         <>
           <MenuCatalogGrid menuItems={products} />
-          <PaginationControls page={safePage} totalPages={totalPages} />
+          <PaginationControls currentPage={safePage} totalPages={totalPages} />
         </>
       )}
 

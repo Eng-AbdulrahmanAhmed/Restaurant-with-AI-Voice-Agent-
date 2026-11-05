@@ -22,13 +22,17 @@ const categories: Category[] = [
 
 type Props = {
   activeCategory: string;
-  onCategoryChange: (category: string) => void;
+  onCategoryChange:(category:string) => void;
+  search: string;
+  onSearchChange: (value: string) => void;
 };
 
 export default function MenuCatalogHeader(
-  {activeCategory, onCategoryChange}
+  {activeCategory,
+  onCategoryChange,
+  search,
+  onSearchChange,}
 :Props){
-
   return (
     <section className="space-y-8">
       <div className="flex flex-col items-center space-y-3 text-center">
@@ -91,7 +95,9 @@ export default function MenuCatalogHeader(
           />
           <input
             type="text"
+            value={search}
             placeholder="Search dishes..."
+            onChange={(e) => onSearchChange(e.target.value)}
             className="h-10 w-full rounded-full border border-ink/10 bg-cream pl-10 pr-4
                        text-sm text-ink placeholder:text-brown/50 outline-none transition
                        focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
