@@ -25,12 +25,12 @@ type Props = {
   onCategoryChange: (category: string) => void;
 };
 
-export default function MenuCatalogHeader() {
-  // const activeCategory = 
-  return (
+export default function MenuCatalogHeader(
+  {activeCategory, onCategoryChange}
+:Props){
 
+  return (
     <section className="space-y-8">
-      
       <div className="flex flex-col items-center space-y-3 text-center">
         <span
           className="inline-flex items-center gap-2 rounded-full bg-orange/10 px-4 py-2
@@ -57,16 +57,14 @@ export default function MenuCatalogHeader() {
           {categories.map(({ label, icon, lucideIcon }) => (
             <button
               key={label}
-              // onClick={() => onCategoryChange(label)}
+              onClick={() => onCategoryChange(label)}
               className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold
-                          transition-all duration-200 `}
+                          transition-all duration-200 ${
+                            activeCategory === label
+                              ? "bg-ink text-cream shadow-[0_8px_18px_-8px_rgba(36,23,8,0.6)]"
+                              : "text-ink/70 hover:bg-orange/10 hover:text-orange"
+                          }`}
             >
-              
-
-
-
-
-
 
               {lucideIcon ? (
                 (() => {
@@ -98,9 +96,7 @@ export default function MenuCatalogHeader() {
                        text-sm text-ink placeholder:text-brown/50 outline-none transition
                        focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
           />
-          
         </div>
-
       </div>
     </section>
   );
@@ -108,8 +104,3 @@ export default function MenuCatalogHeader() {
 
 
 
-// ${
-//                             activeCategory === label
-//                               ? "bg-ink text-cream shadow-[0_8px_18px_-8px_rgba(36,23,8,0.6)]"
-//                               : "text-ink/70 hover:bg-orange/10 hover:text-orange"
-//                           }

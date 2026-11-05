@@ -47,8 +47,8 @@ export default function ProductsBrowser({ page }: { page: number }) {
   return (
     <section className="space-y-7 px-6 pt-10 pb-12 lg:px-10">
       <MenuCatalogHeader
-      // activeCategory={activeCategory}
-      // onCategoryChange={handleCategoryChange}
+      activeCategory={activeCategory}
+      onCategoryChange={handleCategoryChange}
       />
 
       {loading ? (
@@ -92,10 +92,12 @@ export default function ProductsBrowser({ page }: { page: number }) {
       ) : error ? (
         <p className="py-10 text-center text-sm text-tomato">{error}</p>
       ) : (
-        <MenuCatalogGrid menuItems={products} />
+        <>
+          <MenuCatalogGrid menuItems={products} />
+          <PaginationControls page={safePage} totalPages={totalPages} />
+        </>
       )}
 
-      <PaginationControls page={safePage} totalPages={totalPages} />
     </section>
   );
 }
