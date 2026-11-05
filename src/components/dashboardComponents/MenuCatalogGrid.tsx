@@ -64,11 +64,12 @@ export default function MenuCatalogGrid({
   return (
     <div className="mb-8 space-y-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {menuItems.map( item => {
+        {menuItems.map( (item, index) => {
            return (
             <article
               key={item.id}
-              className="flex flex-col rounded-[1.75rem] border border-ink/10 bg-white p-5
+              style={{ animationDelay: `${index * 60}ms` }}
+              className="card-in flex flex-col rounded-[1.75rem] border border-ink/10 bg-white p-5
                          shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)]
                          transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_32px_-22px_rgba(36,23,8,0.45)]"
             >
