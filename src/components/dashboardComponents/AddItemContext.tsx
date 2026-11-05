@@ -7,7 +7,7 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react";
 import AddItemModal from "./AddItemModal";
-import type { MenuItem } from "./MenuCatalogGrid";
+import type { MenuItem } from "@/types/types";
 
 type AddItemContextValue = {
     openAddItem: () => void;

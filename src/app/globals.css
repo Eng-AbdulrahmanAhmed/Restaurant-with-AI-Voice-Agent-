@@ -41,6 +41,12 @@
   --animate-float-delayed: float-y 6.5s ease-in-out 0.8s infinite;
   --animate-bump: bump 0.35s ease-out;
   --animate-wave: wave-drift 9s linear infinite;
+  --animate-bar-grow: bar-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes bar-grow {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
 
   @keyframes marquee-x {
     from { transform: translateX(0); }

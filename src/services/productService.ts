@@ -1,7 +1,17 @@
 import { createClient } from "@/lib/supabase/client";
 
-export async function getProducts() {
+export async function getProducts({
+    page = 1,
+    MAX_PRODUCT_PER_PAGE = 6
+}: {
+    page?: number;
+    MAX_PRODUCT_PER_PAGE?: number;
+} = {}) {
     const supabase = createClient();
+
+    // Calculate LIMIT and OFFSET
+    const from = (page - 1) * MAX_PRODUCT_PER_PAGE;
+    const to = from + MAX_PRODUCT_PER_PAGE - 1;
 
     const { data, count, error } = await supabase
         .from("products")
@@ -19,7 +29,8 @@ export async function getProducts() {
                 is_available
             )
         `, { count: "exact" })
-        .eq("is_available", true);
+        .eq("is_available", true)
+        .range(from, to);
 
     if (error) {
         throw error;

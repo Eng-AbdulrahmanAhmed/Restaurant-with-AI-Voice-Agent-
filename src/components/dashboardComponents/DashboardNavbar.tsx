@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
+    LayoutDashboard,
     LayoutGrid,
     ShoppingBag,
     ChartNoAxesCombined,
@@ -17,11 +18,23 @@ import burgerLogo from "@/assets/logo-no-background.png";
    wordmark, segmented pill nav (active = ink), orange pill CTA.
    Same links, same active-route logic, same sign-out button. */
 
+/* NAV LINKS — added "Dashboard" home entry; "Menu Items" now points at the
+   real catalog route (/dashboard/menu) instead of the dashboard home.
+   (undo: remove the Dashboard entry and set Menu Items href back to "/dashboard") */
+const navLinks = [
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { label: "Menu Items", href: "/dashboard/menu", icon: LayoutGrid },
+    { label: "Orders", href: "/dashboard/live-orders", icon: ShoppingBag },
+    { label: "Analytics", href: "/dashboard/analytics", icon: ChartNoAxesCombined },
+];
+
+/* OLD (undo)
 const navLinks = [
     { label: "Menu Items", href: "/dashboard", icon: LayoutGrid },
     { label: "Orders", href: "/dashboard/live-orders", icon: ShoppingBag },
     { label: "Analytics", href: "/dashboard/analytics", icon: ChartNoAxesCombined },
 ];
+*/
 
 export default function DashboardNavbar() {
     const pathname = usePathname();

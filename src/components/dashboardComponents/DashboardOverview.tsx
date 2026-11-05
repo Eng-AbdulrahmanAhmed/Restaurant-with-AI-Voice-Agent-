@@ -8,10 +8,6 @@ import {
 import { useState , useEffect} from "react"
 import { getProducts } from "@/services/productService";
 
-/* REDESIGN — same four stats, restyled with the reference palette:
-   soft white cards on cream, tinted icon chips, Fraunces numbers. */
-
-
 export default function DashboardOverview() {
   
 const [totalProducts, setTotalProducts] = useState(0);
@@ -69,20 +65,20 @@ const stats = [
         return (
           <div
             key={stat.title}
-            className="flex w-full max-w-[230px] items-center gap-3 rounded-2xl border border-ink/10 bg-white px-3.5 py-3 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_32px_-22px_rgba(36,23,8,0.45)] sm:w-[230px]"
+            className="group flex w-full max-w-[230px] items-center gap-3 rounded-2xl border border-ink/10 bg-white px-3.5 py-3 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)] transition-all hover:-translate-y-0.5 hover:border-orange/20 hover:shadow-[0_20px_32px_-22px_rgba(36,23,8,0.45)] sm:w-[230px]"
           >
             <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${stat.iconStyle}`}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${stat.iconStyle} transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110`}
             >
               <Icon size={19} strokeWidth={2} />
             </div>
 
             <div className="min-w-0">
-              <p className="text-xs font-medium text-brown/70">
+              <p className="text-xs font-medium text-brown/70 transition-colors duration-200 group-hover:text-orange-deep">
                 {stat.title}
               </p>
 
-              <h3 className="mt-0.5 truncate font-display text-lg font-bold text-ink">
+              <h3 className="mt-0.5 truncate font-display text-lg font-bold text-ink transition-colors duration-200 group-hover:text-orange">
                 {stat.value}
               </h3>
 
