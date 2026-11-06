@@ -107,6 +107,33 @@ export default function MenuCatalogGrid({
                   <p className="mt-2 font-display text-xl font-bold text-orange">
                     ${item.price.toFixed(2)}
                   </p>
+
+                  {item.variants && item.variants.length > 0 && (
+                    <ul className="mt-2 space-y-0.5 text-[11px] font-medium text-brown/70">
+                      {item.variants.slice(0, 3).map((variant) => (
+                        <li
+                          key={variant.id}
+                          className="flex items-center gap-1.5"
+                        >
+                          <span className="h-1 w-1 shrink-0 rounded-full bg-orange" />
+                          <span className="truncate">{variant.name}</span>
+                          <span className="ml-auto shrink-0 text-brown/60">
+                            ${variant.price.toFixed(2)}
+                            {variant.calories != null && (
+                              <span className="text-brown/40">
+                                {" "}· {variant.calories} kcal
+                              </span>
+                            )}
+                          </span>
+                        </li>
+                      ))}
+                      {item.variants.length > 3 && (
+                        <li className="text-[10px] font-medium text-brown/50">
+                          + {item.variants.length - 3} more
+                        </li>
+                      )}
+                    </ul>
+                  )}
                 </div>
               </div>
 

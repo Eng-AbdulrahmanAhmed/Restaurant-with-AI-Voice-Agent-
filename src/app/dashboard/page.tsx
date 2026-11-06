@@ -5,6 +5,7 @@ import {
   ChartNoAxesCombined,
   ArrowRight,
   ChefHat,
+  Calendar,
 } from "lucide-react";
 import DashboardOverview from "@/components/dashboardComponents/DashboardOverview";
 import DashboardInsights from "@/components/dashboardComponents/DashboardInsights";
@@ -17,6 +18,13 @@ const quickActions = [
     description: "Add, edit or remove dishes.",
     href: "/dashboard/menu",
     icon: LayoutGrid,
+    soon: false,
+  },
+  {
+    title: "Reservations",
+    description: "Manage table bookings.",
+    href: "/dashboard/reservations",
+    icon: Calendar,
     soon: false,
   },
   {
@@ -84,8 +92,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Quick actions — compact 3-card row */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {/* Quick actions — compact 4-card row */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {quickActions.map(
             ({ title, description, href, icon: Icon, soon }) => {
               const inner = (

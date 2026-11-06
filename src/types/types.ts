@@ -8,4 +8,29 @@ export type MenuItem = {
   stock?: number | null;
   popular?: boolean;
   spicy?: boolean;
+  variants?: MenuProductVariant[];
+};
+
+export type MenuProductVariant = {
+  id: string;
+  name: string;
+  price: number;
+  calories: number | null;
+};
+
+export type MenuProduct = {
+  id: string;
+  name: string;
+  category: "Burgers" | "Sides" | "Drinks" | "Desserts";
+  description: string;
+  price: number;
+  image: string;
+  badge?: string;
+  popular?: boolean;
+  prepTime: string;
+  calories: string;
+  ingredients: string[];
+  spicy?: boolean;
+  aliases: string[];
+  variants: MenuProductVariant[];
 };

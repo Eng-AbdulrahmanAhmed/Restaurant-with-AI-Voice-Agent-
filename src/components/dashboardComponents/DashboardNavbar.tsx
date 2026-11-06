@@ -8,6 +8,7 @@ import {
     LayoutGrid,
     ShoppingBag,
     ChartNoAxesCombined,
+    Calendar,
     LogOut
 } from "lucide-react";
 import { useAddItem } from "./AddItemContext";
@@ -24,6 +25,7 @@ import burgerLogo from "@/assets/logo-no-background.png";
 const navLinks = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { label: "Menu Items", href: "/dashboard/menu", icon: LayoutGrid },
+    { label: "Reservations", href: "/dashboard/reservations", icon: Calendar },
     { label: "Orders", href: "/dashboard/live-orders", icon: ShoppingBag },
     { label: "Analytics", href: "/dashboard/analytics", icon: ChartNoAxesCombined },
 ];

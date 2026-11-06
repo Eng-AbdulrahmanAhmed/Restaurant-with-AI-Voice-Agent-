@@ -28,12 +28,16 @@ export async function getProducts({
         description,
         image_url,
         is_available,
+        preparation_time,
         categories!inner (
             name
         ),
         product_variants (
+            id,
+            name,
             price,
-            is_available
+            is_available,
+            calories
         )
     `, { count: "exact" })
     .eq("is_available", true);
@@ -60,11 +64,20 @@ export async function getProducts({
     }
 
     const products = data.flatMap((product) => {
-        const availableVariant = product.product_variants.find(
-            (variant) => variant.is_available
-        );
+        const variants = (product.product_variants ?? [])
+            .filter((variant) => variant.is_available)
+            .map((variant) => ({
+                id: String(variant.id),
+                name: variant.name ?? "Regular",
+                price: Number(variant.price),
+                calories:
+                    variant.calories != null ? Number(variant.calories) : null,
+            }))
+            .sort((a, b) => a.price - b.price);
 
-        if (!availableVariant) return [];
+        if (!variants.length) return [];
+
+        const cheapest = variants[0];
 
         // Handle both full URLs and relative Storage paths.
         const storedImage = product.image_url?.trim();
@@ -81,11 +94,12 @@ export async function getProducts({
             id: product.id,
             name: product.name,
             description: product.description,
-            price: Number(availableVariant.price),
+            price: cheapest.price,
             category:
                 (product.categories as unknown as { name: string } | null)?.name
                 ?? "Uncategorized",
             image: imageUrl,
+            variants,
         }];
     });
 

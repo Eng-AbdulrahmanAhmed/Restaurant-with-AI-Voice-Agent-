@@ -4,8 +4,23 @@
    logic yet). Darkened backdrop + centered scrollable panel. The trigger
    lives in DashboardNavbar, which owns the open/close toggle. */
 
+import { useEffect, useState } from "react";
 import { Plus, X, ImagePlus } from "lucide-react";
 import type { MenuItem } from "@/types/types";
+
+type VariantRow = { id: string; name: string; price: string; calories: string };
+
+function initialRows(item?: MenuItem | null): VariantRow[] {
+  if (item?.variants?.length) {
+    return item.variants.map((variant) => ({
+      id: variant.id,
+      name: variant.name,
+      price: String(variant.price),
+      calories: variant.calories != null ? String(variant.calories) : "",
+    }));
+  }
+  return [{ id: "new-1", name: "", price: "", calories: "" }];
+}
 
 type Props = {
     open: boolean;
@@ -15,9 +30,34 @@ type Props = {
 };
 
 export default function AddItemModal({ open, onClose, item }: Props) {
-    if (!open) return null;
-
     const editing = item != null;
+    const [variantRows, setVariantRows] = useState<VariantRow[]>(() => initialRows(item));
+
+    useEffect(() => {
+        setVariantRows(initialRows(item));
+    }, [item]);
+
+    const updateVariant = (id: string, patch: Partial<VariantRow>) => {
+        setVariantRows((prev) => prev.map((row) => (row.id === id ? { ...row, ...patch } : row)));
+    };
+
+    const removeVariant = (id: string) => {
+        setVariantRows((prev) => (prev.length > 1 ? prev.filter((row) => row.id !== id) : prev));
+    };
+
+    const addVariant = () => {
+        setVariantRows((prev) => [
+            ...prev,
+            {
+                id: `new-${Date.now()}-${prev.length}`,
+                name: "",
+                price: "",
+                calories: "",
+            },
+        ]);
+    };
+
+    if (!open) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4 backdrop-blur-[2px]">
@@ -194,6 +234,68 @@ export default function AddItemModal({ open, onClose, item }: Props) {
                                            font-medium text-ink outline-none transition placeholder:text-brown/50
                                            focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
                             />
+                        </div>
+                    </div>
+
+                    {/* Variants */}
+                    <div>
+                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-brown">
+                            Variants
+                        </label>
+                        <div className="space-y-2">
+                            {variantRows.map((row) => (
+                                <div
+                                    key={row.id}
+                                    className="flex flex-wrap items-center gap-2 rounded-2xl border border-ink/10 bg-cream/60 p-2"
+                                >
+                                    <input
+                                        type="text"
+                                        value={row.name}
+                                        onChange={(e) => updateVariant(row.id, { name: e.target.value })}
+                                        aria-label="Variant name"
+                                        placeholder="Regular"
+                                        className="h-9 min-w-0 flex-1 basis-32 rounded-xl border border-ink/10 bg-white px-2 text-xs font-medium text-ink outline-none transition placeholder:text-brown/50 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
+                                    />
+                                    <div className="relative">
+                                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-bold text-brown/70">$</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value={row.price}
+                                            onChange={(e) => updateVariant(row.id, { price: e.target.value })}
+                                            aria-label="Variant price"
+                                            placeholder="0.00"
+                                            className="h-9 w-20 rounded-xl border border-ink/10 bg-white pl-5 pr-2 text-xs font-medium text-ink outline-none transition placeholder:text-brown/50 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
+                                        />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={row.calories}
+                                        onChange={(e) => updateVariant(row.id, { calories: e.target.value })}
+                                        aria-label="Variant calories"
+                                        placeholder="kcal"
+                                        className="h-9 w-20 rounded-xl border border-ink/10 bg-white px-2 text-xs font-medium text-ink outline-none transition placeholder:text-brown/50 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeVariant(row.id)}
+                                        aria-label="Remove variant"
+                                        className="flex h-9 w-9 items-center justify-center rounded-xl text-brown/60 transition hover:bg-tomato/10 hover:text-tomato"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={addVariant}
+                                className="flex items-center gap-1.5 rounded-full border border-orange/40 bg-orange/10 px-3 py-1.5 text-[11px] font-bold text-orange-deep transition hover:bg-orange hover:text-cream"
+                            >
+                                <Plus size={12} strokeWidth={2.8} />
+                                Add Variant
+                            </button>
                         </div>
                     </div>
 

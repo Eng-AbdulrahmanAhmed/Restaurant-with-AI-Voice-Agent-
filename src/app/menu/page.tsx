@@ -1,9 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
-import type { StaticImageData } from "next/image";
 import Link from "next/link";
+import type { MenuProduct } from "@/types/types";
+import { getPublicMenuProducts } from "@/services/publicMenuService";
+type Product = MenuProduct;
 import {
   Search,
   ShoppingCart,
@@ -32,11 +34,7 @@ import {
   Heart,
 } from "lucide-react";
 import burgerLogo from "@/assets/logo-no-background.png";
-import burgerPhoto from "@/assets/burger-photo.png";
 import heroImage from "@/assets/hero-image.png";
-import friesPhoto from "@/assets/fries-photo.png";
-import strawberryShake from "@/assets/strawberry-shake.png";
-import cupcakeArt from "@/assets/cupcake.svg";
 
 /* ============================================================================
    STYLE MOD (menu design v3, single file only)
@@ -51,597 +49,6 @@ import cupcakeArt from "@/assets/cupcake.svg";
    - Logic untouched — styling only.
    Undo: the pre-restyle version is in git (commit e84c6d2).
 ============================================================================ */
-
-// ============================================================================
-// SECTION 1 — MENU TYPES & DATA (17 hardcoded dishes)
-// ============================================================================
-export interface Product {
-  id: number;
-  name: string;
-  category: "Burgers" | "Sides" | "Drinks" | "Desserts";
-  description: string;
-  price: number;
-  image: string;
-  badge?: string;
-  popular?: boolean;
-  calories: string;
-  prepTime: string;
-  ingredients: string[];
-  spicy?: boolean;
-  aliases: string[];
-}
-
-const MENU_PRODUCTS: Product[] = [
-  {
-    id: 1,
-    name: "Classic Cheeseburger",
-    category: "Burgers",
-    description: "180g prime local beef patty, melted Wisconsin cheddar, crisp leaf lettuce, vine tomato, and signature house burger relish.",
-    price: 8.99,
-    image: "",
-    badge: "Fan Favorite",
-    popular: true,
-    calories: "620 kcal",
-    prepTime: "8-10 min",
-    ingredients: ["180g Angus", "Aged Cheddar", "Brioche Bun", "House Relish"],
-    aliases: ["classic cheeseburger", "classic burger", "cheeseburger", "burger"],
-  },
-  {
-    id: 2,
-    name: "Double Bacon BBQ Burger",
-    category: "Burgers",
-    description: "Twin seared flame patties, applewood-smoked bacon rashers, double American cheddar, and slow-simmered smoky bourbon glaze.",
-    price: 12.99,
-    image: "",
-    badge: "Grill Master Pick",
-    popular: true,
-    calories: "890 kcal",
-    prepTime: "10-12 min",
-    ingredients: ["Double Patty", "Applewood Bacon", "Bourbon BBQ", "Caramelized Onion"],
-    aliases: ["double bacon burger", "bacon burger", "double bacon", "bbq burger"],
-  },
-  {
-    id: 3,
-    name: "Mushroom Swiss Truffle Burger",
-    category: "Burgers",
-    description: "Charred Angus patty draped in sautéed garlic cremini mushrooms, melted Swiss Emmental, and black truffle aioli.",
-    price: 11.49,
-    image: "",
-    popular: false,
-    calories: "710 kcal",
-    prepTime: "9-11 min",
-    ingredients: ["Cremini Mushrooms", "Swiss Emmental", "Truffle Aioli", "Garlic Butter"],
-    aliases: ["mushroom burger", "mushroom swiss", "truffle burger"],
-  },
-  {
-    id: 4,
-    name: "Crispy Buttermilk Hot Chicken",
-    category: "Burgers",
-    description: "24-hr marinated chicken thigh in herb buttermilk, hand-dredged till crispy, cayenne oil dip, house pickles, and creamy ranch slaw.",
-    price: 10.49,
-    image: "",
-    badge: "Spicy Crunch",
-    popular: true,
-    calories: "740 kcal",
-    prepTime: "10-12 min",
-    spicy: true,
-    ingredients: ["Buttermilk Thigh", "Cayenne Glaze", "Pickled Cucumbers", "Ranch Slaw"],
-    aliases: ["chicken burger", "chicken sandwich", "hot chicken", "crispy chicken"],
-  },
-  {
-    id: 5,
-    name: "Island Teriyaki Chicken Grill",
-    category: "Burgers",
-    description: "Flame-grilled chicken thigh lacquered in house teriyaki, charred pineapple ring and wasabi mayo on a buttery bun.",
-    price: 10.99,
-    image: "",
-    badge: "Island Glaze",
-    popular: true,
-    calories: "700 kcal",
-    prepTime: "9-11 min",
-    ingredients: ["Teriyaki Glaze", "Grilled Pineapple", "Wasabi Mayo"],
-    aliases: ["teriyaki chicken", "island chicken", "pineapple chicken"],
-  },
-  {
-    id: 6,
-    name: "Garden Halloumi Smash",
-    category: "Burgers",
-    description: "Seared golden halloumi over smashed herbed chickpeas, cool tzatziki, crunchy baby gem and sun-dried tomato tapenade.",
-    price: 9.49,
-    image: "",
-    badge: "Plant Power",
-    popular: false,
-    calories: "540 kcal",
-    prepTime: "8-10 min",
-    ingredients: ["Grilled Halloumi", "Herbed Chickpea", "Tzatziki"],
-    aliases: ["halloumi burger", "veggie burger", "garden smash"],
-  },
-  {
-    id: 7,
-    name: "Smoky Cowboy Brisket Burger",
-    category: "Burgers",
-    description: "Low-and-slow smoked beef brisket, sharp cheddar, candied pickled jalapeños and a splash of espresso BBQ on a toasted brioche.",
-    price: 11.99,
-    image: "",
-    badge: "New This Week",
-    popular: false,
-    calories: "820 kcal",
-    prepTime: "10-12 min",
-    ingredients: ["Smoked Brisket", "Sharp Cheddar", "Pickled Jalapeños"],
-    aliases: ["brisket burger", "cowboy burger", "smoky burger"],
-  },
-  {
-    id: 8,
-    name: "Rustic Rosemary Sea Salt Fries",
-    category: "Sides",
-    description: "Hand-cut Idaho russet potatoes, double-fried in sunflower oil, dusted with freshly crushed sea salt and mountain rosemary.",
-    price: 3.99,
-    image: "",
-    popular: true,
-    calories: "340 kcal",
-    prepTime: "4-6 min",
-    ingredients: ["Idaho Russets", "Mountain Rosemary", "Maldon Sea Salt"],
-    aliases: ["french fries", "fries", "rosemary fries", "rustic fries"],
-  },
-  {
-    id: 9,
-    name: "Truffle Parmesan Loaded Fries",
-    category: "Sides",
-    description: "Golden shoestring fries buried under parmesan snow, optional truffle oil drizzle and a whisper of chive dust.",
-    price: 5.99,
-    image: "",
-    badge: "Bestseller Reload",
-    popular: true,
-    calories: "480 kcal",
-    prepTime: "5-7 min",
-    ingredients: ["Truffle Oil", "Parmesan Snow", "Chive Dust"],
-    aliases: ["loaded fries", "truffle fries", "parmesan fries"],
-  },
-  {
-    id: 10,
-    name: "Beer-Battered Crisp Onion Rings",
-    category: "Sides",
-    description: "Jumbo Spanish sweet onions sliced thick, submerged in craft amber ale batter, served with spicy campfire smoked dip.",
-    price: 4.49,
-    image: "",
-    popular: false,
-    calories: "390 kcal",
-    prepTime: "5-7 min",
-    ingredients: ["Spanish Onions", "Amber Ale Batter", "Campfire Dip"],
-    aliases: ["onion rings", "rings", "beer onion rings"],
-  },
-  {
-    id: 11,
-    name: "Sweet Chili Popcorn Chicken",
-    category: "Sides",
-    description: "Crunchy bite-size popcorn chicken tossed through sweet chili glaze and finished with toasted sesame seeds.",
-    price: 4.79,
-    image: "",
-    popular: false,
-    spicy: true,
-    calories: "390 kcal",
-    prepTime: "6-8 min",
-    ingredients: ["Sweet Chili", "Popcorn Chicken", "Toasted Sesame"],
-    aliases: ["popcorn chicken", "sweet chili chicken", "chicken bites"],
-  },
-  {
-    id: 12,
-    name: "House Sparkling Eureka Lemonade",
-    category: "Drinks",
-    description: "Cold-pressed coastal Eureka lemons, steeped with fresh mint leaves and lightly sweetened with unrefined cane sugar.",
-    price: 3.49,
-    image: "",
-    badge: "Fresh Pressed",
-    popular: true,
-    calories: "120 kcal",
-    prepTime: "2 min",
-    ingredients: ["Eureka Lemons", "Fresh Mint", "Organic Cane Sugar", "Sparkling Water"],
-    aliases: ["lemonade", "fresh lemonade", "sparkling lemonade"],
-  },
-  {
-    id: 13,
-    name: "Strawberry Cloud Milkshake",
-    category: "Drinks",
-    description: "Fresh strawberries whipped with vanilla gelato and cold milk, crowned with cream and a berry drizzle.",
-    price: 4.49,
-    image: "",
-    badge: "Thicc & Cold",
-    popular: true,
-    calories: "460 kcal",
-    prepTime: "3 min",
-    ingredients: ["Fresh Strawberries", "Vanilla Gelato", "Whipped Cream"],
-    aliases: ["strawberry milkshake", "milkshake", "strawberry shake"],
-  },
-  {
-    id: 14,
-    name: "Classic Small-Batch Craft Cola",
-    category: "Drinks",
-    description: "Spiced botanical cola crafted with real kola nut extract, cinnamon, vanilla pods, served over crystalline crushed ice.",
-    price: 2.99,
-    image: "",
-    popular: false,
-    calories: "140 kcal",
-    prepTime: "1 min",
-    ingredients: ["Kola Nut Extract", "Vanilla Bean", "Citrus Oils", "Crushed Ice"],
-    aliases: ["cola", "coke", "craft cola", "soda"],
-  },
-  {
-    id: 15,
-    name: "Blueberry Hibiscus Iced Tea",
-    category: "Drinks",
-    description: "Steeped hibiscus blooms shaken with cool blueberry purée and sparkling spring water over crushed ice.",
-    price: 3.29,
-    image: "",
-    popular: false,
-    calories: "90 kcal",
-    prepTime: "2 min",
-    ingredients: ["Hibiscus Bloom", "Blueberry Purée", "Sparkling Water"],
-    aliases: ["iced tea", "hibiscus tea", "blueberry tea"],
-  },
-  {
-    id: 16,
-    name: "Molten Belgian Chocolate Skillet",
-    category: "Desserts",
-    description: "Baked dark 70% Belgian chocolate cake with a warm flowing fudge heart, crowned with Madagascar vanilla bean gelato.",
-    price: 5.99,
-    image: "",
-    badge: "Chef's Special",
-    popular: true,
-    calories: "510 kcal",
-    prepTime: "6-8 min",
-    ingredients: ["70% Dark Chocolate", "Vanilla Gelato", "Cocoa Crumble"],
-    aliases: ["chocolate cake", "skillet cake", "molten cake", "dessert"],
-  },
-  {
-    id: 17,
-    name: "Salted Caramel Brownie Stack",
-    category: "Desserts",
-    description: "Warm fudge brownie squares stacked with salted caramel ribbons and a snowfall of Dutch cocoa dust.",
-    price: 4.99,
-    image: "",
-    badge: "New Dessert",
-    popular: false,
-    calories: "610 kcal",
-    prepTime: "4-6 min",
-    ingredients: ["Fudge Brownie", "Salted Caramel", "Cocoa Dust"],
-    aliases: ["brownie", "caramel brownie", "brownie stack"],
-  },
-  {
-    id: 18,
-    name: "Smoky Chipotle Ranch Burger",
-    category: "Burgers",
-    description: "Flame-grilled patty, chipotle ranch, pepper jack, crispy onion straws, and toasted brioche.",
-    price: 11.29,
-    image: "",
-    badge: "Smoky Heat",
-    popular: true,
-    calories: "780 kcal",
-    prepTime: "9-11 min",
-    spicy: true,
-    ingredients: ["Chipotle Ranch", "Pepper Jack", "Onion Straws"],
-    aliases: ["chipotle burger", "ranch burger", "smoky burger"],
-  },
-  {
-    id: 19,
-    name: "Avocado Bacon Club Burger",
-    category: "Burgers",
-    description: "Grilled chicken, crispy bacon, fresh avocado, lettuce, tomato, and garlic aioli.",
-    price: 12.49,
-    image: "",
-    badge: "Club Classic",
-    popular: true,
-    calories: "810 kcal",
-    prepTime: "10-12 min",
-    ingredients: ["Grilled Chicken", "Bacon", "Avocado", "Garlic Aioli"],
-    aliases: ["avocado burger", "bacon club", "chicken club"],
-  },
-  {
-    id: 20,
-    name: "BBQ Pulled Pork Burger",
-    category: "Burgers",
-    description: "Slow-smoked pulled pork, tangy BBQ sauce, coleslaw, and pickles on a toasted bun.",
-    price: 10.99,
-    image: "",
-    popular: false,
-    calories: "760 kcal",
-    prepTime: "8-10 min",
-    ingredients: ["Pulled Pork", "BBQ Sauce", "Coleslaw"],
-    aliases: ["pulled pork", "bbq pork", "pork burger"],
-  },
-  {
-    id: 21,
-    name: "Cajun Spiced Lamb Burger",
-    category: "Burgers",
-    description: "Spiced lamb patty, feta, tzatziki, rocket, and roasted red peppers.",
-    price: 13.49,
-    image: "",
-    badge: "New",
-    popular: false,
-    calories: "720 kcal",
-    prepTime: "11-13 min",
-    spicy: true,
-    ingredients: ["Lamb Patty", "Feta", "Tzatziki"],
-    aliases: ["lamb burger", "cajun lamb"],
-  },
-  {
-    id: 22,
-    name: "Truffle Mushroom Melt",
-    category: "Burgers",
-    description: "Beef patty, truffle mayo, sauteed mushrooms, gruyere, and arugula.",
-    price: 12.99,
-    image: "",
-    badge: "Truffle",
-    popular: true,
-    calories: "790 kcal",
-    prepTime: "10-12 min",
-    ingredients: ["Truffle Mayo", "Gruyere", "Mushrooms"],
-    aliases: ["truffle melt", "mushroom melt"],
-  },
-  {
-    id: 23,
-    name: "Crispy Fish Fillet Burger",
-    category: "Burgers",
-    description: "Beer-battered fish fillet, tartar sauce, lettuce, and lemon on a soft bun.",
-    price: 9.99,
-    image: "",
-    popular: false,
-    calories: "650 kcal",
-    prepTime: "9-11 min",
-    ingredients: ["Fish Fillet", "Tartar Sauce", "Lemon"],
-    aliases: ["fish burger", "fish fillet"],
-  },
-  {
-    id: 24,
-    name: "Buffalo Chicken Burger",
-    category: "Burgers",
-    description: "Crispy chicken tossed in buffalo sauce, blue cheese crumbles, and celery slaw.",
-    price: 10.79,
-    image: "",
-    badge: "Buffalo",
-    popular: true,
-    calories: "730 kcal",
-    prepTime: "9-11 min",
-    spicy: true,
-    ingredients: ["Buffalo Sauce", "Blue Cheese", "Celery Slaw"],
-    aliases: ["buffalo chicken", "buffalo burger"],
-  },
-  {
-    id: 25,
-    name: "Garlic Parmesan Fries",
-    category: "Sides",
-    description: "Golden fries tossed in garlic butter and parmesan with a herb finish.",
-    price: 4.99,
-    image: "",
-    popular: true,
-    calories: "420 kcal",
-    prepTime: "5-7 min",
-    ingredients: ["Garlic Butter", "Parmesan", "Herbs"],
-    aliases: ["garlic fries", "parmesan fries"],
-  },
-  {
-    id: 26,
-    name: "Loaded Nacho Fries",
-    category: "Sides",
-    description: "Fries loaded with cheese sauce, jalapenos, sour cream, and pico de gallo.",
-    price: 6.49,
-    image: "",
-    badge: "Loaded",
-    popular: true,
-    calories: "560 kcal",
-    prepTime: "6-8 min",
-    spicy: true,
-    ingredients: ["Cheese Sauce", "Jalapenos", "Pico de Gallo"],
-    aliases: ["nacho fries", "loaded fries"],
-  },
-  {
-    id: 27,
-    name: "Sweet Potato Fries",
-    category: "Sides",
-    description: "Crispy sweet potato fries with a smoky chipotle dip.",
-    price: 4.29,
-    image: "",
-    popular: false,
-    calories: "380 kcal",
-    prepTime: "5-7 min",
-    ingredients: ["Sweet Potato", "Chipotle Dip"],
-    aliases: ["sweet potato", "sweet fries"],
-  },
-  {
-    id: 28,
-    name: "Mozzarella Sticks",
-    category: "Sides",
-    description: "Golden fried mozzarella sticks with marinara dipping sauce.",
-    price: 5.49,
-    image: "",
-    badge: "Cheesy",
-    popular: true,
-    calories: "450 kcal",
-    prepTime: "5-7 min",
-    ingredients: ["Mozzarella", "Marinara"],
-    aliases: ["mozzarella sticks", "cheese sticks"],
-  },
-  {
-    id: 29,
-    name: "Coleslaw Cup",
-    category: "Sides",
-    description: "Creamy house coleslaw with a hint of apple cider vinegar.",
-    price: 2.49,
-    image: "",
-    popular: false,
-    calories: "180 kcal",
-    prepTime: "2 min",
-    ingredients: ["Cabbage", "Carrot", "Creamy Dressing"],
-    aliases: ["coleslaw", "slaw"],
-  },
-  {
-    id: 30,
-    name: "Garden Side Salad",
-    category: "Sides",
-    description: "Mixed greens, cherry tomatoes, cucumber, and balsamic vinaigrette.",
-    price: 3.99,
-    image: "",
-    popular: false,
-    calories: "120 kcal",
-    prepTime: "3 min",
-    ingredients: ["Mixed Greens", "Cherry Tomato", "Cucumber"],
-    aliases: ["side salad", "garden salad"],
-  },
-  {
-    id: 31,
-    name: "Mango Passion Smoothie",
-    category: "Drinks",
-    description: "Blended mango and passion fruit with yogurt and honey.",
-    price: 4.79,
-    image: "",
-    badge: "Tropical",
-    popular: true,
-    calories: "210 kcal",
-    prepTime: "2 min",
-    ingredients: ["Mango", "Passion Fruit", "Yogurt"],
-    aliases: ["mango smoothie", "passion smoothie"],
-  },
-  {
-    id: 32,
-    name: "Iced Vanilla Latte",
-    category: "Drinks",
-    description: "Cold espresso with vanilla syrup and milk over ice.",
-    price: 3.99,
-    image: "",
-    popular: true,
-    calories: "180 kcal",
-    prepTime: "2 min",
-    ingredients: ["Espresso", "Vanilla Syrup", "Milk"],
-    aliases: ["vanilla latte", "iced latte"],
-  },
-  {
-    id: 33,
-    name: "Peach Iced Tea",
-    category: "Drinks",
-    description: "Brewed black tea with peach syrup poured over crushed ice.",
-    price: 3.29,
-    image: "",
-    popular: false,
-    calories: "95 kcal",
-    prepTime: "2 min",
-    ingredients: ["Black Tea", "Peach Syrup"],
-    aliases: ["peach tea", "iced tea"],
-  },
-  {
-    id: 34,
-    name: "Chocolate Peanut Butter Shake",
-    category: "Drinks",
-    description: "Rich chocolate and peanut butter blended thick with vanilla ice cream.",
-    price: 5.29,
-    image: "",
-    badge: "Indulgent",
-    popular: true,
-    calories: "520 kcal",
-    prepTime: "3 min",
-    ingredients: ["Chocolate", "Peanut Butter", "Vanilla Ice Cream"],
-    aliases: ["chocolate shake", "peanut butter shake"],
-  },
-  {
-    id: 35,
-    name: "Fresh Orange Juice",
-    category: "Drinks",
-    description: "Freshly squeezed oranges served chilled over ice.",
-    price: 3.49,
-    image: "",
-    popular: false,
-    calories: "110 kcal",
-    prepTime: "2 min",
-    ingredients: ["Fresh Oranges"],
-    aliases: ["orange juice", "fresh juice"],
-  },
-  {
-    id: 36,
-    name: "New York Cheesecake Slice",
-    category: "Desserts",
-    description: "Creamy cheesecake with a graham cracker crust and berry compote.",
-    price: 5.49,
-    image: "",
-    badge: "Classic",
-    popular: true,
-    calories: "480 kcal",
-    prepTime: "3 min",
-    ingredients: ["Cream Cheese", "Graham Crust", "Berry Compote"],
-    aliases: ["cheesecake", "ny cheesecake"],
-  },
-  {
-    id: 37,
-    name: "Apple Pie with Cinnamon",
-    category: "Desserts",
-    description: "Warm apple pie spiced with cinnamon and a scoop of vanilla ice cream.",
-    price: 4.99,
-    image: "",
-    popular: true,
-    calories: "430 kcal",
-    prepTime: "4-6 min",
-    ingredients: ["Apples", "Cinnamon", "Vanilla Ice Cream"],
-    aliases: ["apple pie", "pie"],
-  },
-  {
-    id: 38,
-    name: "Tiramisu Cup",
-    category: "Desserts",
-    description: "Coffee-soaked ladyfingers layered with silky mascarpone cream.",
-    price: 5.99,
-    image: "",
-    badge: "Italian",
-    popular: false,
-    calories: "410 kcal",
-    prepTime: "3 min",
-    ingredients: ["Ladyfingers", "Mascarpone", "Espresso"],
-    aliases: ["tiramisu", "tiramisu cup"],
-  },
-  {
-    id: 39,
-    name: "Strawberry Shortcake",
-    category: "Desserts",
-    description: "Fluffy sponge cake layered with fresh strawberries and whipped cream.",
-    price: 4.79,
-    image: "",
-    popular: true,
-    calories: "390 kcal",
-    prepTime: "3 min",
-    ingredients: ["Sponge Cake", "Strawberries", "Whipped Cream"],
-    aliases: ["shortcake", "strawberry cake"],
-  },
-  {
-    id: 40,
-    name: "Chocolate Lava Cake",
-    category: "Desserts",
-    description: "Warm chocolate cake with a molten center, served with ice cream.",
-    price: 5.99,
-    image: "",
-    badge: "Lava",
-    popular: true,
-    calories: "520 kcal",
-    prepTime: "6-8 min",
-    ingredients: ["Dark Chocolate", "Vanilla Ice Cream"],
-    aliases: ["lava cake", "chocolate lava"],
-  },
-];
-
-/* Shared artwork resolver — exactly the dashboard catalog's mapping:
-   Burgers alternate burger-photo.png / hero-image.png, Sides are fries,
-   Drinks are the strawberry shake, Desserts use the cupcake placeholder. */
-const BURGER_ART = [burgerPhoto, heroImage];
-const ART_BY_CATEGORY: Record<Product["category"], StaticImageData> = {
-  Burgers: burgerPhoto,
-  Sides: friesPhoto,
-  Drinks: strawberryShake,
-  Desserts: cupcakeArt,
-};
-function artFor(product: Product): string {
-  if (product.category === "Burgers") {
-    return BURGER_ART[(product.id - 1) % BURGER_ART.length].src;
-  }
-  return ART_BY_CATEGORY[product.category].src;
-}
-MENU_PRODUCTS.forEach((p) => {
-  p.image = artFor(p);
-});
 
 const CATEGORIES = [
   { label: "All Items", icon: Utensils },
@@ -683,19 +90,107 @@ const RESTAURANT_STATS = [
   },
 ];
 
+type CartEntry = {
+  id: string;
+  productId: string;
+  variantId: string;
+  name: string;
+  variantName: string;
+  price: number;
+  image: string;
+  quantity: number;
+};
+
+function SkeletonMenuGrid({ count = 9 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-2 gap-3.5 md:grid-cols-3">
+      {Array.from({ length: count }).map((_, index) => (
+        <article
+          key={index}
+          aria-hidden="true"
+          className="flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-3 shadow-[0_10px_24px_-18px_rgba(36,23,8,0.4)]"
+        >
+          <div className="h-44 w-full animate-pulse rounded-xl bg-cream-deep" />
+          <div className="mt-2.5 min-w-0 flex-1">
+            <div className="h-2.5 w-20 animate-pulse rounded bg-cream-deep" />
+            <div className="mt-2 h-4 w-32 animate-pulse rounded bg-cream-deep" />
+            <div className="mt-2 h-3 w-full animate-pulse rounded bg-cream-deep" />
+            <div className="mt-1 h-3 w-5/6 animate-pulse rounded bg-cream-deep" />
+            <div className="mt-2 h-5 w-14 animate-pulse rounded bg-cream-deep" />
+          </div>
+          <div className="mt-2 flex flex-wrap items-center gap-1">
+            <div className="h-5 w-16 animate-pulse rounded-md bg-cream-deep" />
+            <div className="h-5 w-12 animate-pulse rounded-md bg-cream-deep" />
+          </div>
+          <div className="mt-3 flex items-center justify-between pt-2.5">
+            <div className="h-9 w-28 animate-pulse rounded-full bg-cream-deep" />
+            <div className="h-7 w-14 animate-pulse rounded-full bg-cream-deep" />
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 export default function CustomerMenuPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [allImagesLoaded, setAllImagesLoaded] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>("All Items");
   const [searchQuery, setSearchQuery] = useState("");
   const [dietaryFilter, setDietaryFilter] = useState<"all" | "popular" | "spicy">("all");
   const [orderType, setOrderType] = useState<"dine-in" | "takeout">("dine-in");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
+
+  const selectedVariantId = (product: Product) =>
+    selectedVariants[product.id] ?? product.variants[0]?.id ?? "";
+  const currentVariant = (product: Product) =>
+    product.variants.find((v) => v.id === selectedVariantId(product)) ?? product.variants[0];
 
   // AI popup state — console mounts once, toggles visibility
   const [aiOpen, setAiOpen] = useState(false);
   const [trayOpen, setTrayOpen] = useState(false);
 
   // Cart State
-  const [cart, setCart] = useState<{ product: Product; quantity: number }[]>([]);
+  const [cart, setCart] = useState<CartEntry[]>([]);
+
+  useEffect(() => {
+    if (!products.length) return;
+    let done = 0;
+    const onDone = () => {
+      done += 1;
+      if (done >= products.length) setAllImagesLoaded(true);
+    };
+    setAllImagesLoaded(false);
+    products.forEach((product) => {
+      const img = new window.Image();
+      img.onload = onDone;
+      img.onerror = onDone;
+      img.src = product.image;
+    });
+  }, [products]);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    setLoadError(null);
+    getPublicMenuProducts()
+      .then((items) => {
+        if (mounted) setProducts(items);
+      })
+      .catch((err) => {
+        console.error("Failed to load public menu products", err);
+        if (mounted) setLoadError("Could not load the menu from the database.");
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // AI Voice State
   const [isListening, setIsListening] = useState(false);
@@ -715,23 +210,36 @@ export default function CustomerMenuPage() {
   // --------------------------------------------------------------------------
   // Cart Handlers
   // --------------------------------------------------------------------------
-  const addToCart = (product: Product, quantity = 1) => {
+  const addToCart = (product: Product, quantity = 1, variantId?: string) => {
+    const variant = product.variants.find((v) => v.id === variantId) ?? product.variants[0];
     setCart((prev) => {
-      const idx = prev.findIndex((i) => i.product.id === product.id);
+      const idx = prev.findIndex((i) => i.id === variant.id);
       if (idx > -1) {
         const next = [...prev];
         next[idx] = { ...next[idx], quantity: next[idx].quantity + quantity };
         return next;
       }
-      return [...prev, { product, quantity }];
+      return [
+        ...prev,
+        {
+          id: variant.id,
+          productId: product.id,
+          variantId: variant.id,
+          name: product.name,
+          variantName: variant.name,
+          price: variant.price,
+          image: product.image,
+          quantity,
+        },
+      ];
     });
   };
 
-  const updateCartQty = (productId: number, delta: number) => {
+  const updateCartQty = (cartId: string, delta: number) => {
     setCart((prev) =>
       prev
         .map((item) =>
-          item.product.id === productId
+          item.id === cartId
             ? { ...item, quantity: item.quantity + delta }
             : item
         )
@@ -739,12 +247,12 @@ export default function CustomerMenuPage() {
     );
   };
 
-  const removeCartItem = (productId: number) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId));
+  const removeCartItem = (cartId: string) => {
+    setCart((prev) => prev.filter((item) => item.id !== cartId));
   };
 
   const subtotal = useMemo(
-    () => cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0),
+    () => cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
     [cart]
   );
   const tax = subtotal * 0.0825;
@@ -774,7 +282,7 @@ export default function CustomerMenuPage() {
     const lower = raw.toLowerCase();
     const matches: { product: Product; qty: number }[] = [];
 
-    MENU_PRODUCTS.forEach((p) => {
+    products.forEach((p) => {
       const foundAlias = p.aliases.find((alias) => lower.includes(alias));
       if (foundAlias) {
         let count = 1;
@@ -869,7 +377,7 @@ export default function CustomerMenuPage() {
   // Filtered Products
   // --------------------------------------------------------------------------
   const filteredProducts = useMemo(() => {
-    return MENU_PRODUCTS.filter((item) => {
+    return products.filter((item) => {
       const matchCat =
         activeCategory === "All Items" || item.category === activeCategory;
       const matchSearch =
@@ -885,14 +393,14 @@ export default function CustomerMenuPage() {
 
       return matchCat && matchSearch && matchDietary;
     });
-  }, [activeCategory, searchQuery, dietaryFilter]);
+  }, [activeCategory, searchQuery, dietaryFilter, products]);
 
   // Pagination: 9 smaller cards per page
   const ITEMS_PER_PAGE = 9;
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeCategory, searchQuery, dietaryFilter]);
+  }, [activeCategory, searchQuery, dietaryFilter, products]);
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
@@ -1048,8 +556,8 @@ export default function CustomerMenuPage() {
                   const active = activeCategory === label;
                   const count =
                     label === "All Items"
-                      ? MENU_PRODUCTS.length
-                      : MENU_PRODUCTS.filter((p) => p.category === label).length;
+                      ? products.length
+                      : products.filter((p) => p.category === label).length;
                   return (
                     <button
                       key={label}
@@ -1109,10 +617,16 @@ export default function CustomerMenuPage() {
           <div className="lg:col-span-9">
 
             {/* Sub-section 5a — Product grid (photo-top cards, 3 per row) */}
-            {filteredProducts.length > 0 ? (
+            {loading || (products.length > 0 && !allImagesLoaded) ? (
+              <SkeletonMenuGrid count={9} />
+            ) : loadError ? (
+              <p role="alert" className="py-10 text-center text-sm text-tomato">{loadError}</p>
+            ) : filteredProducts.length > 0 ? (
               <div className="grid grid-cols-2 gap-3.5 md:grid-cols-3">
                 {paginatedProducts.map((product) => {
-                  const cartEntry = cart.find((i) => i.product.id === product.id);
+                  const variant = currentVariant(product);
+                  const selectedId = selectedVariantId(product);
+                  const cartEntry = cart.find((i) => i.variantId === variant.id);
                   const qty = cartEntry ? cartEntry.quantity : 0;
 
                   return (
@@ -1145,6 +659,28 @@ export default function CustomerMenuPage() {
                         />
                       </div>
 
+                      {/* Variant picker */}
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-brown/50">Variant</span>
+                        {product.variants.map((v) => {
+                          const active = v.id === selectedId;
+                          return (
+                            <button
+                              key={v.id}
+                              type="button"
+                              onClick={() => setSelectedVariants((prev) => ({ ...prev, [product.id]: v.id }))}
+                              className={`rounded-full border px-2 py-1 text-[10px] font-semibold transition-all duration-200 ${
+                                active
+                                  ? "border-ink bg-ink text-cream"
+                                  : "border-ink/10 bg-cream text-brown/70 hover:border-orange hover:text-orange"
+                              }`}
+                            >
+                              {v.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+
                       {/* Info */}
                       <div className="mt-2.5 flex min-w-0 flex-1 flex-col">
                         <span className="text-[9px] font-extrabold uppercase tracking-wider text-orange-deep">
@@ -1157,14 +693,14 @@ export default function CustomerMenuPage() {
                           {product.description}
                         </p>
                         <p className="mt-1.5 font-display text-base font-bold text-orange">
-                          ${product.price.toFixed(2)}
+                          ${variant.price.toFixed(2)}
                         </p>
                       </div>
 
                       {/* Meta chips + action footer (catalog toolbar pattern) */}
                       <div className="mt-2 flex flex-wrap items-center gap-1">
                         <span className="flex items-center gap-1 rounded-md bg-cream px-2 py-0.5 text-[10px] font-semibold text-brown/80">
-                          <Beef size={10} /> {product.calories}
+                          <Beef size={10} /> {variant.calories != null ? `${variant.calories} kcal` : '—'}
                         </span>
                         <span className="flex items-center gap-1 rounded-md bg-cream px-2 py-0.5 text-[10px] font-semibold text-brown/80">
                           <Clock size={10} /> {product.prepTime}
@@ -1174,7 +710,7 @@ export default function CustomerMenuPage() {
                         {qty === 0 ? (
                           <button
                             type="button"
-                            onClick={() => addToCart(product, 1)}
+                            onClick={() => addToCart(product, 1, selectedId)}
                             className="flex h-9 items-center gap-1.5 rounded-full bg-orange px-4 text-xs font-semibold text-cream shadow-[0_8px_18px_-6px_rgba(242,105,13,0.6)] transition-all hover:-translate-y-0.5 hover:bg-orange-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange motion-reduce:hover:translate-y-0 active:translate-y-0"
                           >
                             <Plus size={15} />
@@ -1184,7 +720,7 @@ export default function CustomerMenuPage() {
                           <div className="flex items-center gap-1.5 rounded-full border border-ink/10 bg-cream p-1">
                             <button
                               type="button"
-                              onClick={() => updateCartQty(product.id, -1)}
+                              onClick={() => updateCartQty(variant.id, -1)}
                               className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-brown shadow-sm transition hover:bg-tomato/10 hover:text-tomato"
                             >
                               <Minus size={13} />
@@ -1194,7 +730,7 @@ export default function CustomerMenuPage() {
                             </span>
                             <button
                               type="button"
-                              onClick={() => updateCartQty(product.id, 1)}
+                              onClick={() => updateCartQty(variant.id, 1)}
                               className="flex h-7 w-7 items-center justify-center rounded-full bg-orange text-cream shadow-sm transition hover:bg-orange-deep"
                             >
                               <Plus size={13} />
@@ -1339,37 +875,38 @@ export default function CustomerMenuPage() {
                       </p>
                     </div>
                   ) : (
-                    cart.map(({ product, quantity }) => (
+                    cart.map((entry) => (
                       <div
-                        key={product.id}
+                        key={entry.id}
                         className="flex items-center justify-between gap-2.5 rounded-xl border border-ink/5 bg-cream/60 p-2"
                       >
                         <img
-                          src={product.image}
-                          alt={product.name}
+                          src={entry.image}
+                          alt={entry.name}
                           className="flex h-11 w-11 items-center justify-center rounded-lg bg-cream-deep object-contain p-1"
                         />
                         <div className="min-w-0 flex-1">
                           <h4 className="truncate text-xs font-bold text-ink">
-                            {product.name}
+                            {entry.name}
+                            {entry.variantName ? ` · ${entry.variantName}` : ""}
                           </h4>
                           <p className="font-display text-xs font-bold text-orange">
-                            ${(product.price * quantity).toFixed(2)}
+                            ${(entry.price * entry.quantity).toFixed(2)}
                           </p>
                         </div>
 
                         <div className="flex items-center gap-1 rounded-full border border-ink/10 bg-white p-0.5">
                           <button
-                            onClick={() => updateCartQty(product.id, -1)}
+                            onClick={() => updateCartQty(entry.id, -1)}
                             className="flex h-5 w-5 items-center justify-center rounded-full text-brown hover:bg-cream"
                           >
                             <Minus size={11} />
                           </button>
                           <span className="w-4 text-center text-[11px] font-bold">
-                            {quantity}
+                            {entry.quantity}
                           </span>
                           <button
-                            onClick={() => updateCartQty(product.id, 1)}
+                            onClick={() => updateCartQty(entry.id, 1)}
                             className="flex h-5 w-5 items-center justify-center rounded-full text-brown hover:bg-cream"
                           >
                             <Plus size={11} />
@@ -1377,7 +914,7 @@ export default function CustomerMenuPage() {
                         </div>
 
                         <button
-                          onClick={() => removeCartItem(product.id)}
+                          onClick={() => removeCartItem(entry.id)}
                           className="text-brown/50 transition-colors hover:text-tomato"
                         >
                           <Trash2 size={13} />
@@ -1615,4 +1152,5 @@ export default function CustomerMenuPage() {
     </div>
   );
 }
+
 
