@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -13,8 +12,16 @@ import {
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 
+// ---------------------------------------------------------------------------
+// STEP 4 — CLIENT ROLE (commented out — learning baseline)
+// Adds a "role" value ("admin" | "customer" | null) so UI can hide admin
+// links. To restore: uncomment the role field, the role state, the lookup
+// effect, and the provider value below.
+// ---------------------------------------------------------------------------
+
 type AuthContextType = {
     user: User | null;
+    // role: "admin" | "customer" | null;
     loading: boolean;
     signOut: () => Promise<void>;
 };
@@ -25,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = useMemo(() => createClient(), []);
 
     const [user, setUser] = useState<User | null>(null);
+    // const [role, setRole] = useState<"admin" | "customer" | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -39,6 +47,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             subscription.unsubscribe();
         };
     }, [supabase]);
+
+    /*
+    useEffect(() => {
+        if (!user) {
+            setRole(null);
+            return;
+        }
+
+        let cancelled = false;
+
+        supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single()
+            .then(({ data }) => {
+                if (cancelled) return;
+                setRole(data?.role === "admin" ? "admin" : "customer");
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [user, supabase]);
+    */
 
     async function signOut() {
         const { error } = await supabase.auth.signOut();

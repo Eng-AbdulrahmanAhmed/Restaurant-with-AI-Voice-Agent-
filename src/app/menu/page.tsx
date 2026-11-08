@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
@@ -434,7 +434,6 @@ export default function CustomerMenuPage() {
                 { label: "Home", href: "/" },
                 { label: "Artisan Menu", href: "/menu", active: true },
                 { label: "Our Story", href: "/about" },
-                { label: "Dashboard", href: "/dashboard" },
               ].map(({ label, href, ...rest }) => (
                 <li key={label}>
                   <Link

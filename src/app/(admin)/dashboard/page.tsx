@@ -32,14 +32,14 @@ const quickActions = [
     description: "Track kitchen progress.",
     href: "/dashboard/live-orders",
     icon: ShoppingBag,
-    soon: true,
+    soon: false,
   },
   {
     title: "Analytics",
     description: "Review sales trends.",
     href: "/dashboard/analytics",
     icon: ChartNoAxesCombined,
-    soon: true,
+    soon: false,
   },
 ];
 

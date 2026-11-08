@@ -31,6 +31,11 @@ export default function Signin() {
             const data = await signInWithEmail(email, password);
 
             if (data.session) {
+                // STEP A (commented out — learning baseline): honour ?next=
+                // const next = new URLSearchParams(window.location.search).get("next");
+                // const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+                // router.push(safeNext);
+
                 router.push("/");
                 router.refresh();
             }

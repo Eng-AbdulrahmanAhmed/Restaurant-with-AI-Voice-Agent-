@@ -147,13 +147,13 @@ export default function ReservationsPage() {
         ].map(({ label, value, icon: Icon, iconStyle }) => (
           <div
             key={label}
-            className="rounded-2xl border border-ink/10 bg-white p-4 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)]"
+            className="group rounded-[1.75rem] border border-ink/10 bg-white p-4 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)] transition-all hover:-translate-y-0.5 hover:border-orange/20 hover:shadow-[0_20px_32px_-24px_rgba(36,23,8,0.45)]"
           >
-            <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${iconStyle}`}>
+            <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${iconStyle} transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110`}>
               <Icon size={17} strokeWidth={2} />
             </div>
-            <p className="mt-3 text-[11px] font-medium text-brown/70">{label}</p>
-            <p className="mt-0.5 font-display text-2xl font-bold text-ink">{value}</p>
+            <p className="mt-3 text-[11px] font-medium text-brown/70 transition-colors duration-200 group-hover:text-orange-deep">{label}</p>
+            <p className="mt-0.5 font-display text-2xl font-bold text-ink transition-colors duration-200 group-hover:text-orange">{value}</p>
           </div>
         ))}
       </div>
@@ -206,7 +206,7 @@ export default function ReservationsPage() {
         {filtered.map((reservation) => (
           <article
             key={reservation.id}
-            className="rounded-[1.5rem] border border-ink/10 bg-white p-4 shadow-[0_14px_30px_-24px_rgba(36,23,8,0.35)]"
+            className="group rounded-[1.75rem] border border-ink/10 bg-white p-4 shadow-[0_14px_30px_-24px_rgba(36,23,8,0.35)] transition-all hover:-translate-y-0.5 hover:border-orange/20 hover:shadow-[0_20px_32px_-24px_rgba(36,23,8,0.45)]"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">

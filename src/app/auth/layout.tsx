@@ -3,8 +3,9 @@ import Image from "next/image";
 import FoodDoodle from "@/assets/food doodle.jpg";
 import burgerLogo from "@/assets/logo-no-background.png";
 import { ArrowLeft } from "lucide-react";
+import { ReactNode } from "react";
 
-export default function layout({ children }: LayoutProps<"/">) {
+export default function layout({ children }: {children:ReactNode}) {
   return (
     <section className="flex h-screen w-full">
       <div className="flex w-full flex-col bg-cream px-6 pb-6 pt-4 md:w-1/2 lg:px-16">
