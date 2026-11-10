@@ -105,7 +105,7 @@ export default function MenuCatalogGrid({
                   </p>
 
                   <p className="mt-2 font-display text-xl font-bold text-orange">
-                    ${item.price.toFixed(2)}
+                    EGP {item.price.toFixed(2)}
                   </p>
 
                   {item.variants && item.variants.length > 0 && (
@@ -118,7 +118,7 @@ export default function MenuCatalogGrid({
                           <span className="h-1 w-1 shrink-0 rounded-full bg-orange" />
                           <span className="truncate">{variant.name}</span>
                           <span className="ml-auto shrink-0 text-brown/60">
-                            ${variant.price.toFixed(2)}
+                            EGP {variant.price.toFixed(2)}
                             {variant.calories != null && (
                               <span className="text-brown/40">
                                 {" "}· {variant.calories} kcal

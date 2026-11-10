@@ -29,7 +29,7 @@ useEffect(() => {
 const stats = [
   {
     title: "Today's Sales",
-    value: "$842",
+    value: "EGP 842",
     detail: "Sales today",
     icon: Banknote,
     iconStyle: "bg-orange/10 text-orange",

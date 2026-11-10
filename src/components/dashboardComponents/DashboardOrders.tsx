@@ -76,7 +76,7 @@ export default function DashboardOrders() {
               </span>
 
               <span className="w-14 text-right font-display text-sm font-bold text-ink">
-                ${order.total.toFixed(2)}
+                EGP {order.total.toFixed(2)}
               </span>
             </div>
           </div>

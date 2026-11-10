@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { MenuProduct } from "@/types/types";
+import type { CartItem } from "@/types/cart";
+import { useCart } from "@/context/CartContext";
 import { getPublicMenuProducts } from "@/services/publicMenuService";
+import { useLiveKitAssistant } from "@/hooks/useLiveKitAssistant";
 type Product = MenuProduct;
+
 import {
   Search,
   ShoppingCart,
@@ -32,6 +37,10 @@ import {
   Sparkles,
   ChefHat,
   Heart,
+  Loader2,
+  PhoneOff,
+  VolumeX,
+  AlertCircle,
 } from "lucide-react";
 import burgerLogo from "@/assets/logo-no-background.png";
 import heroImage from "@/assets/hero-image.png";
@@ -46,7 +55,7 @@ import heroImage from "@/assets/hero-image.png";
    - Better spacing and breathing room throughout
    - AI console floating popup (same as before)
    - Whole page uses site tokens (cream / ink / orange / brown / gold)
-   - Logic untouched — styling only.
+   - Logic untouched â€” styling only.
    Undo: the pre-restyle version is in git (commit e84c6d2).
 ============================================================================ */
 
@@ -58,7 +67,7 @@ const CATEGORIES = [
   { label: "Desserts", icon: IceCream },
 ] as const;
 
-// QUICK STATS — same card anatomy as DashboardOverview (tinted icon chips).
+// QUICK STATS â€” same card anatomy as DashboardOverview (tinted icon chips).
 const RESTAURANT_STATS = [
   {
     label: "Grill Status",
@@ -89,17 +98,6 @@ const RESTAURANT_STATS = [
     color: "bg-ink/10 text-ink",
   },
 ];
-
-type CartEntry = {
-  id: string;
-  productId: string;
-  variantId: string;
-  name: string;
-  variantName: string;
-  price: number;
-  image: string;
-  quantity: number;
-};
 
 function SkeletonMenuGrid({ count = 9 }: { count?: number }) {
   return (
@@ -149,13 +147,106 @@ export default function CustomerMenuPage() {
   const currentVariant = (product: Product) =>
     product.variants.find((v) => v.id === selectedVariantId(product)) ?? product.variants[0];
 
-  // AI popup state — console mounts once, toggles visibility
+  // AI popup state â€” console mounts once, toggles visibility
   const [aiOpen, setAiOpen] = useState(false);
   const [trayOpen, setTrayOpen] = useState(false);
 
   // Cart State
-  const [cart, setCart] = useState<CartEntry[]>([]);
+  const { cart, addToCart, updateCartQty, removeCartItem, clearCart, totalItemCount, subtotal } = useCart();
+  const router = useRouter();
+  const { status, error, messages, micEnabled, audioBlocked, connect, disconnect, toggleMic, enableAudio } =
+    useLiveKitAssistant();
 
+  const assistantStatusLabel =
+    status === "error"
+      ? "Connection failed"
+      : status === "connecting"
+        ? "Connecting to GrillBot..."
+        : status === "waiting"
+          ? "Waiting for GrillBot..."
+          : status === "speaking"
+            ? "GrillBot is speaking"
+            : status === "listening"
+              ? "GrillBot is listening"
+              : "Not connected";
+
+  const statusDotClass =
+    status === "speaking"
+      ? "animate-pulse bg-orange"
+      : status === "listening"
+        ? "bg-lettuce"
+        : status === "connecting" || status === "waiting"
+          ? "animate-pulse bg-gold"
+          : status === "error"
+            ? "bg-tomato"
+            : "bg-ink/25";
+
+  const micTitle =
+    status === "error"
+      ? "Connection failed"
+      : status === "connecting"
+        ? "Connecting..."
+        : status === "waiting"
+          ? "Waiting for GrillBot..."
+          : status === "speaking"
+            ? "GrillBot is talking..."
+            : status === "listening"
+              ? micEnabled
+                ? "Listening to you..."
+                : "Mic is muted"
+              : "Tap to start talking";
+
+  const micHint =
+    status === "disconnected"
+      ? "Starts a live session with the AI agent"
+      : status === "error"
+        ? "Tap the mic to try again"
+        : status === "connecting"
+          ? "Ringing the kitchen line"
+          : status === "waiting"
+            ? "GrillBot is joining the room"
+            : status === "listening"
+              ? micEnabled
+                ? "Speak naturally - it hears you"
+                : "Tap to unmute and speak"
+              : "Reply out loud, then wait for GrillBot";
+
+  const isSessionActive =
+    status === "connecting" ||
+    status === "waiting" ||
+    status === "listening" ||
+    status === "speaking";
+
+  const openAiConsole = () => {
+    setAiOpen(true);
+
+    // Opening the console is what starts the session — never leave the panel
+    // showing "listening" while there is no room behind it.
+    if (status === "disconnected" || status === "error") {
+      void connect();
+    }
+  };
+
+  const minimizeAiConsole = () => {
+    setAiOpen(false);
+  };
+
+  const endAiSession = () => {
+    void disconnect();
+    setAiOpen(false);
+  };
+
+  const handleMicClick = () => {
+    if (status === "disconnected" || status === "error") {
+      void connect();
+      return;
+    }
+
+    if (status === "connecting") return;
+
+    // Connected: the mic only mutes/unmutes, it must not kill the agent session.
+    void toggleMic();
+  };
   useEffect(() => {
     if (!products.length) return;
     let done = 0;
@@ -163,19 +254,18 @@ export default function CustomerMenuPage() {
       done += 1;
       if (done >= products.length) setAllImagesLoaded(true);
     };
-    setAllImagesLoaded(false);
+    const resetId = window.setTimeout(() => setAllImagesLoaded(false), 0);
     products.forEach((product) => {
       const img = new window.Image();
       img.onload = onDone;
       img.onerror = onDone;
       img.src = product.image;
     });
+    return () => window.clearTimeout(resetId);
   }, [products]);
 
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
-    setLoadError(null);
     getPublicMenuProducts()
       .then((items) => {
         if (mounted) setProducts(items);
@@ -192,75 +282,45 @@ export default function CustomerMenuPage() {
     };
   }, []);
 
-  // AI Voice State
-  const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState("");
+  // AI Voice State — the live conversation comes from the LiveKit agent;
+  // aiAssistantLogs only carries the local quick-command feedback.
   const [aiAssistantLogs, setAiAssistantLogs] = useState<
     { role: "user" | "bot"; text: string; time: string }[]
   >([
     {
       role: "bot",
-      text: "Welcome to BurgerHouse! Tap the microphone and say something like 'Add 2 classic burgers and rustic fries'.",
+      text: "Welcome to BurgerHouse! Tap the mic and say something like 'Add 2 classic burgers and rustic fries'.",
       time: "Ready",
     },
   ]);
 
-  const recognitionRef = useRef<any>(null);
+  const conversation = useMemo(
+    () => [
+      ...aiAssistantLogs,
+      ...messages.map((message) => ({
+        role: message.role === "agent" ? ("bot" as const) : ("user" as const),
+        text: message.text,
+        time: new Date(message.at).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      })),
+    ].slice(-4),
+    [aiAssistantLogs, messages]
+  );
+
+  // Keep the newest line of the conversation in view as the agent talks.
+  const feedRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const feed = feedRef.current;
+    if (feed) feed.scrollTop = feed.scrollHeight;
+  }, [conversation]);
 
   // --------------------------------------------------------------------------
   // Cart Handlers
   // --------------------------------------------------------------------------
-  const addToCart = (product: Product, quantity = 1, variantId?: string) => {
-    const variant = product.variants.find((v) => v.id === variantId) ?? product.variants[0];
-    setCart((prev) => {
-      const idx = prev.findIndex((i) => i.id === variant.id);
-      if (idx > -1) {
-        const next = [...prev];
-        next[idx] = { ...next[idx], quantity: next[idx].quantity + quantity };
-        return next;
-      }
-      return [
-        ...prev,
-        {
-          id: variant.id,
-          productId: product.id,
-          variantId: variant.id,
-          name: product.name,
-          variantName: variant.name,
-          price: variant.price,
-          image: product.image,
-          quantity,
-        },
-      ];
-    });
-  };
-
-  const updateCartQty = (cartId: string, delta: number) => {
-    setCart((prev) =>
-      prev
-        .map((item) =>
-          item.id === cartId
-            ? { ...item, quantity: item.quantity + delta }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
-  };
-
-  const removeCartItem = (cartId: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== cartId));
-  };
-
-  const subtotal = useMemo(
-    () => cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
-    [cart]
-  );
   const tax = subtotal * 0.0825;
   const grandTotal = subtotal > 0 ? subtotal + tax : 0;
-  const totalItemCount = useMemo(
-    () => cart.reduce((acc, item) => acc + item.quantity, 0),
-    [cart]
-  );
 
   // --------------------------------------------------------------------------
   // Voice AI Parser
@@ -329,50 +389,6 @@ export default function CustomerMenuPage() {
     }
   };
 
-  const toggleMicListening = () => {
-    if (typeof window === "undefined") return;
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      alert("Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.");
-      return;
-    }
-
-    if (isListening) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
-      return;
-    }
-
-    const rec = new SpeechRecognition();
-    rec.lang = "en-US";
-    rec.interimResults = true;
-    rec.continuous = false;
-    recognitionRef.current = rec;
-
-    rec.onstart = () => {
-      setIsListening(true);
-      setTranscript("");
-    };
-
-    rec.onresult = (evt: any) => {
-      const curIndex = evt.resultIndex;
-      const heard = evt.results[curIndex][0].transcript;
-      setTranscript(heard);
-      if (evt.results[curIndex].isFinal) {
-        executeVoiceOrder(heard);
-        setTranscript("");
-      }
-    };
-
-    rec.onerror = () => setIsListening(false);
-    rec.onend = () => setIsListening(false);
-
-    rec.start();
-  };
-
   // --------------------------------------------------------------------------
   // Filtered Products
   // --------------------------------------------------------------------------
@@ -399,7 +415,8 @@ export default function CustomerMenuPage() {
   const ITEMS_PER_PAGE = 9;
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
   useEffect(() => {
-    setCurrentPage(1);
+    const timeoutId = window.setTimeout(() => setCurrentPage(1), 0);
+    return () => window.clearTimeout(timeoutId);
   }, [activeCategory, searchQuery, dietaryFilter, products]);
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -409,7 +426,7 @@ export default function CustomerMenuPage() {
   return (
     <div className="min-h-screen bg-cream text-ink selection:bg-orange selection:text-cream">
       {/* =====================================================================
-          SECTION 2 — TOP NAVIGATION BAR (landing Navbar pattern)
+          SECTION 2 â€” TOP NAVIGATION BAR (landing Navbar pattern)
       ===================================================================== */}
       <header className="sticky top-0 z-40 border-b border-ink/[0.06] bg-cream/90 shadow-[0_1px_0_0_rgba(36,23,8,0.04)] backdrop-blur-md">
         <div className="mx-auto grid h-[72px] max-w-[1500px] grid-cols-[auto_1fr_auto] items-center gap-4 px-6 lg:px-10">
@@ -465,7 +482,7 @@ export default function CustomerMenuPage() {
       </header>
 
       {/* =====================================================================
-          SECTION 3 — COMPACT HERO BAR (animated gradient, blobs, burger art)
+          SECTION 3 â€” COMPACT HERO BAR (animated gradient, blobs, burger art)
       ===================================================================== */}
       <section className="relative overflow-hidden border-b border-ink/10 bg-cream-deep/40 py-7">
         {/* animated gradient wash + drifting blobs */}
@@ -521,7 +538,7 @@ export default function CustomerMenuPage() {
       <div className="mx-auto max-w-[1500px] px-6 py-10 lg:px-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* ===============================================================
-              SECTION 4 — LEFT RAIL (search, categories, dietary filters)
+              SECTION 4 â€” LEFT RAIL (search, categories, dietary filters)
           ================================================================ */}
           <aside className="lg:col-span-3">
             <div className="sticky top-24 rounded-[1.75rem] border border-ink/10 bg-white p-4 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)]">
@@ -611,11 +628,11 @@ export default function CustomerMenuPage() {
           </aside>
 
           {/* ===============================================================
-              SECTION 5 — CENTER PRODUCT GRID
+              SECTION 5 â€” CENTER PRODUCT GRID
           ================================================================ */}
           <div className="lg:col-span-9">
 
-            {/* Sub-section 5a — Product grid (photo-top cards, 3 per row) */}
+            {/* Sub-section 5a â€” Product grid (photo-top cards, 3 per row) */}
             {loading || (products.length > 0 && !allImagesLoaded) ? (
               <SkeletonMenuGrid count={9} />
             ) : loadError ? (
@@ -692,14 +709,14 @@ export default function CustomerMenuPage() {
                           {product.description}
                         </p>
                         <p className="mt-1.5 font-display text-base font-bold text-orange">
-                          ${variant.price.toFixed(2)}
+                          EGP {variant.price.toFixed(2)}
                         </p>
                       </div>
 
                       {/* Meta chips + action footer (catalog toolbar pattern) */}
                       <div className="mt-2 flex flex-wrap items-center gap-1">
                         <span className="flex items-center gap-1 rounded-md bg-cream px-2 py-0.5 text-[10px] font-semibold text-brown/80">
-                          <Beef size={10} /> {variant.calories != null ? `${variant.calories} kcal` : '—'}
+                          <Beef size={10} /> {variant.calories != null ? `${variant.calories} kcal` : 'â€”'}
                         </span>
                         <span className="flex items-center gap-1 rounded-md bg-cream px-2 py-0.5 text-[10px] font-semibold text-brown/80">
                           <Clock size={10} /> {product.prepTime}
@@ -808,7 +825,7 @@ export default function CustomerMenuPage() {
           </div>
 
           {/* ===============================================================
-              SECTION 6 — ORDER TRAY POPUP (opened from the navbar cart
+              SECTION 6 â€” ORDER TRAY POPUP (opened from the navbar cart
               button; ALWAYS MOUNTED, only visually hidden)
           ================================================================ */}
           <div
@@ -887,10 +904,10 @@ export default function CustomerMenuPage() {
                         <div className="min-w-0 flex-1">
                           <h4 className="truncate text-xs font-bold text-ink">
                             {entry.name}
-                            {entry.variantName ? ` · ${entry.variantName}` : ""}
+                            {entry.variantName ? ` \u00B7 ${entry.variantName}` : ""}
                           </h4>
                           <p className="font-display text-xs font-bold text-orange">
-                            ${(entry.price * entry.quantity).toFixed(2)}
+                            EGP {(entry.price * entry.quantity).toFixed(2)}
                           </p>
                         </div>
 
@@ -927,30 +944,52 @@ export default function CustomerMenuPage() {
                 <div className="space-y-1.5 border-t border-ink/10 pt-3 text-xs font-semibold text-brown">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span className="text-ink">${subtotal.toFixed(2)}</span>
+                    <span className="text-ink">EGP {subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Estimated Tax (8.25%)</span>
-                    <span className="text-ink">${tax.toFixed(2)}</span>
+                    <span className="text-ink">EGP {tax.toFixed(2)}</span>
                   </div>
                   <div className="flex items-baseline justify-between border-t border-ink/10 pt-2 text-sm font-bold text-ink">
                     <span>Total Due</span>
                     <span className="font-display text-2xl font-bold text-orange">
-                      ${grandTotal.toFixed(2)}
+                      EGP {grandTotal.toFixed(2)}
                     </span>
                   </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-2.5">
+                  <Link
+                    href="/cart"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-white px-4 py-2 text-xs font-semibold text-ink transition hover:border-orange hover:text-orange"
+                  >
+                    View cart
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={clearCart}
+                    disabled={cart.length === 0}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-white px-4 py-2 text-xs font-bold text-brown transition hover:border-tomato hover:text-tomato disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <X size={13} strokeWidth={2.5} />
+                    Clear tray
+                  </button>
                 </div>
 
                 {/* Checkout CTA */}
                 <button
                   type="button"
                   disabled={cart.length === 0}
-                  onClick={() =>
-                    alert("Ticket sent to the kitchen! Your order is being grilled.")
-                  }
+                  onClick={() => {
+                    if (orderType === "dine-in") {
+                      router.push("/table-selection");
+                    } else {
+                      router.push("/checkout");
+                    }
+                  }}
                   className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-orange text-xs font-extrabold uppercase tracking-wider text-cream shadow-[0_10px_24px_-8px_rgba(242,105,13,0.6)] transition-all hover:-translate-y-0.5 hover:bg-orange-deep hover:shadow-[0_14px_28px_-8px_rgba(242,105,13,0.7)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange motion-reduce:hover:translate-y-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40 active:translate-y-0"
                 >
-                  Fire Up Order
+                  {orderType === "dine-in" ? "Choose table" : "Proceed to checkout"}
                   <ArrowRight size={15} />
                 </button>
               </div>
@@ -959,7 +998,7 @@ export default function CustomerMenuPage() {
       </div>
 
       {/* =====================================================================
-          SECTION 6 — FLOATING AI CONSOLE (popup on the right)
+          SECTION 6 â€” FLOATING AI CONSOLE (popup on the right)
           A circular GrillBot FAB sits bottom-right; the console pops open
           above it. The panel is ALWAYS MOUNTED (only visually hidden), so a
           speech order keeps running when you minimize it.
@@ -967,12 +1006,18 @@ export default function CustomerMenuPage() {
       {/* FAB */}
       <button
         type="button"
-        onClick={() => setAiOpen((v) => !v)}
+        onClick={() => {
+          if (aiOpen) {
+            minimizeAiConsole();
+          } else {
+            openAiConsole();
+          }
+        }}
         aria-expanded={aiOpen}
         aria-label="Open AI voice ordering console"
         className="group fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-ink text-cream shadow-[0_14px_28px_-10px_rgba(36,23,8,0.6)] transition-all hover:-translate-y-0.5 hover:bg-orange motion-reduce:hover:translate-y-0"
       >
-        {/* Hover info popup — only while the console is closed */}
+        {/* Hover info popup â€” only while the console is closed */}
         {!aiOpen && (
           <span
             aria-hidden
@@ -983,12 +1028,21 @@ export default function CustomerMenuPage() {
               AI Voice GrillBot
             </span>
             <span className="mt-1 block text-[11px] leading-relaxed text-brown">
-              Say your order with your voice - hands-free.
+              {status === "disconnected"
+                ? "Tap to start a live voice session."
+                : assistantStatusLabel}
             </span>
           </span>
         )}
-        {isListening && !aiOpen && (
+        {!aiOpen && status === "speaking" && (
           <span className="absolute -inset-2 animate-ping rounded-full bg-orange/30" />
+        )}
+        {!aiOpen && isSessionActive && (
+          <span
+            className={`absolute right-1.5 top-1.5 h-2 w-2 rounded-full ring-2 ring-ink ${
+              micEnabled ? "bg-lettuce" : "bg-gold"
+            }`}
+          />
         )}
         {aiOpen ? (
           <X size={22} />
@@ -1020,33 +1074,31 @@ export default function CustomerMenuPage() {
               <h3 className="font-display text-sm font-bold text-ink">
                 AI Voice Grill Master
               </h3>
-              <p className="flex items-center gap-1.5 text-[10px] font-semibold text-brown">
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${
-                    isListening ? "animate-ping bg-tomato" : "bg-lettuce"
-                  }`}
-                />
-                {isListening ? "Listening live..." : "Speech Engine Active"}
+              <p
+                className="flex items-center gap-1.5 text-[10px] font-semibold text-brown"
+                aria-live="polite"
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${statusDotClass}`} />
+                {assistantStatusLabel}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            {isListening && (
+            {isSessionActive && (
               <button
                 type="button"
-                onClick={() => {
-                  recognitionRef.current?.stop();
-                  setIsListening(false);
-                }}
-                className="rounded-full bg-tomato/10 px-2.5 py-1 text-[10px] font-bold text-tomato transition hover:bg-tomato/20"
+                onClick={endAiSession}
+                aria-label="End AI session"
+                className="flex items-center gap-1 rounded-full bg-tomato/10 px-2.5 py-1 text-[10px] font-bold text-tomato transition hover:bg-tomato/20"
               >
-                Stop
+                <PhoneOff size={11} />
+                End
               </button>
             )}
             <button
               type="button"
-              onClick={() => setAiOpen(false)}
+              onClick={minimizeAiConsole}
               aria-label="Minimize console"
               className="flex h-7 w-7 items-center justify-center rounded-full text-brown/60 transition hover:bg-cream hover:text-ink"
             >
@@ -1056,49 +1108,81 @@ export default function CustomerMenuPage() {
         </div>
 
         <div className="p-5">
+          {error && (
+            <div
+              role="alert"
+              className="mb-3 flex items-start gap-2 rounded-xl border border-tomato/20 bg-tomato/5 px-3 py-2 text-[11px] font-semibold text-tomato"
+            >
+              <AlertCircle size={13} className="mt-0.5 shrink-0" />
+              <span className="flex-1 leading-relaxed">{error}</span>
+              <button
+                type="button"
+                onClick={() => void connect()}
+                className="shrink-0 underline decoration-tomato/40 underline-offset-2"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {audioBlocked && (
+            <button
+              type="button"
+              onClick={() => void enableAudio()}
+              className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-gold/15 px-3 py-2 text-[11px] font-bold text-ink transition hover:bg-gold/25"
+            >
+              <VolumeX size={14} />
+              Tap to enable sound
+            </button>
+          )}
+
           {/* Mic & wave row */}
           <div className="mb-4 flex items-center justify-between rounded-2xl bg-cream/80 p-3.5">
             <div className="flex items-center gap-3">
               <div className="relative">
-                {isListening && (
-                  <span className="absolute -inset-2.5 animate-ping rounded-full bg-tomato/30" />
+                {status === "speaking" && (
+                  <span className="absolute -inset-2.5 animate-ping rounded-full bg-orange/25" />
                 )}
                 <button
                   type="button"
-                  onClick={toggleMicListening}
-                  aria-label="Toggle voice order assistant"
+                  onClick={handleMicClick}
+                  aria-label={micEnabled ? "Mute microphone" : "Talk to the AI assistant"}
+                  aria-pressed={micEnabled}
                   className={`relative flex h-14 w-14 items-center justify-center rounded-full text-cream shadow-lg transition-transform hover:scale-105 active:scale-95 ${
-                    isListening
+                    micEnabled
                       ? "bg-tomato shadow-tomato/20"
                       : "bg-orange shadow-[0_8px_20px_-6px_rgba(242,105,13,0.7)]"
                   }`}
                 >
-                  {isListening ? (
-                    <MicOff size={22} className="animate-pulse" />
-                  ) : (
+                  {status === "connecting" ? (
+                    <Loader2 size={22} className="animate-spin" />
+                  ) : micEnabled ? (
                     <Mic size={22} />
+                  ) : (
+                    <MicOff size={22} />
                   )}
                 </button>
               </div>
               <div>
-                <p className="text-xs font-bold text-ink">
-                  {isListening ? "Listening to order..." : "Tap to Speak Order"}
-                </p>
-                <p className="text-[11px] text-brown">
-                  {transcript ? `“${transcript}”` : "Say quantities + dishes"}
-                </p>
+                <p className="text-xs font-bold text-ink">{micTitle}</p>
+                <p className="text-[11px] text-brown">{micHint}</p>
               </div>
             </div>
 
-            <div className="flex h-5 items-center gap-1">
+            <div className="flex h-5 items-center gap-1" aria-hidden>
               {[0.4, 0.9, 0.6, 1, 0.5].map((factor, i) => (
                 <span
                   key={i}
                   className={`w-1 rounded-full transition-all duration-200 ${
-                    isListening ? "animate-pulse bg-orange" : "bg-ink/15"
+                    status === "listening" || status === "speaking"
+                      ? "animate-pulse bg-orange"
+                      : "bg-ink/15"
                   }`}
                   style={{
-                    height: isListening ? `${factor * 20}px` : "6px",
+                    height:
+                      status === "listening" || status === "speaking"
+                        ? `${factor * 20}px`
+                        : "6px",
                     animationDelay: `${i * 100}ms`,
                   }}
                 />
@@ -1129,8 +1213,11 @@ export default function CustomerMenuPage() {
           </div>
 
           {/* Conversation feed */}
-          <div className="max-h-36 space-y-2 overflow-y-auto rounded-xl border border-ink/5 bg-cream/50 p-2.5 text-xs">
-            {aiAssistantLogs.slice(-3).map((msg, index) => (
+          <div
+            ref={feedRef}
+            className="max-h-36 space-y-2 overflow-y-auto rounded-xl border border-ink/5 bg-cream/50 p-2.5 text-xs"
+          >
+            {conversation.map((msg, index) => (
               <div
                 key={index}
                 className={`rounded-lg p-2 leading-relaxed ${

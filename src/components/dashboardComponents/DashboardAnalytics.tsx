@@ -37,7 +37,8 @@ export default function DashboardAnalytics() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timeoutId = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   return (
@@ -71,7 +72,7 @@ export default function DashboardAnalytics() {
 
       <div className="mt-4 flex flex-wrap items-end gap-2.5">
         <p className="font-display text-2xl font-black tracking-tight text-ink">
-          ${totalSales.toLocaleString()}
+          EGP {totalSales.toLocaleString()}
         </p>
 
         <span className="mb-0.5 inline-flex items-center gap-1 rounded-full bg-lettuce/10 px-2 py-0.5 text-[10px] font-bold text-lettuce">
@@ -121,7 +122,7 @@ export default function DashboardAnalytics() {
                   fontSize: 12,
                 }}
                 labelStyle={{ color: "#6F5230", fontWeight: 600 }}
-                formatter={(value) => [`$${value}`, "Sales"]}
+                formatter={(value) => [`EGP ${value}`, "Sales"]}
               />
 
               <Area

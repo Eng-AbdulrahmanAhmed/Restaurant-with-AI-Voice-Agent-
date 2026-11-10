@@ -329,7 +329,7 @@ export default function LiveOrdersPage() {
                       <span className="font-semibold text-ink">{item.qty}x</span> {item.name}
                     </span>
                     <span className="font-semibold text-brown/70">
-                      {"$" + (item.qty * item.price).toFixed(2)}
+                      {"EGP " + (item.qty * item.price).toFixed(2)}
                     </span>
                   </li>
                 ))}
@@ -340,7 +340,7 @@ export default function LiveOrdersPage() {
                   {order.items.reduce((sum, item) => sum + item.qty, 0)} items
                 </span>
                 <span className="font-display text-lg font-bold text-ink">
-                  {"$" + orderTotal(order).toFixed(2)}
+                  {"EGP " + orderTotal(order).toFixed(2)}
                 </span>
               </div>
 

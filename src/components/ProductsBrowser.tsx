@@ -54,7 +54,7 @@ useEffect(() => {
   }, 300);
 
   return () => clearTimeout(timeout);
-}, [searchInput]);
+}, [searchInput, searchParams, pathname, router]);
 
 
   const totalPages = Math.max(1, Math.ceil(totalCount / MAX_PRODUCT_PER_PAGE));

@@ -29,6 +29,25 @@ function countIsTrue(value?: boolean | null) {
   return Boolean(value);
 }
 
+type ProductRow = {
+  id: string | number;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  is_available: boolean;
+  preparation_time: number | null;
+  categories: Array<{ name: string }> | null;
+  product_variants: Array<{
+    id: string | number;
+    name: string | null;
+    price: number;
+    is_available: boolean;
+    calories: number | null;
+  }>;
+  is_popular?: boolean;
+  is_spicy?: boolean;
+};
+
 export async function getPublicMenuProducts(): Promise<MenuProduct[]> {
   const supabase = createClient();
 
@@ -59,7 +78,7 @@ export async function getPublicMenuProducts(): Promise<MenuProduct[]> {
     throw error;
   }
 
-  return data.flatMap((product) => {
+  return data.flatMap((product: ProductRow) => {
     const rawVariants = (product.product_variants ?? [])
       .filter((variant) => variant.is_available)
       .map((variant) => ({
@@ -74,7 +93,7 @@ export async function getPublicMenuProducts(): Promise<MenuProduct[]> {
 
     const primary = rawVariants.find((v) => v.calories != null) ?? rawVariants[0];
 
-    const rawCategory = (product.categories as unknown as { name: string } | null)?.name ?? "Uncategorized";
+    const rawCategory = product.categories?.[0]?.name ?? "Uncategorized";
     const normalizedCategory =
       rawCategory.charAt(0).toUpperCase() + rawCategory.slice(1).toLowerCase();
     const category = (["Burgers", "Sides", "Drinks", "Desserts"].includes(normalizedCategory)
@@ -89,7 +108,7 @@ export async function getPublicMenuProducts(): Promise<MenuProduct[]> {
             .from("product-images")
             .getPublicUrl(storedImage).data.publicUrl
       : category === "Burgers"
-        ? getBurgerArt(Number(product.id.replace(/\D/g, "").slice(0, 1)) || 0)
+        ? getBurgerArt(Number(String(product.id).replace(/\D/g, "").slice(0, 1)) || 0)
         : ART_BY_CATEGORY[category];
 
     const prepMinutes =
@@ -109,8 +128,8 @@ export async function getPublicMenuProducts(): Promise<MenuProduct[]> {
       calories: caloriesLabel,
       prepTime,
       variants: rawVariants,
-      popular: countIsTrue((product as any).is_popular),
-      spicy: countIsTrue((product as any).is_spicy) || lowerName.includes("spicy") || lowerName.includes("chipotle") || lowerName.includes("buffalo"),
+      popular: countIsTrue(product.is_popular),
+      spicy: countIsTrue(product.is_spicy) || lowerName.includes("spicy") || lowerName.includes("chipotle") || lowerName.includes("buffalo"),
       aliases: lowerName.split(/\s+/).filter(Boolean),
       ingredients: lowerName.split(/\s+/).filter(Boolean),
     }];

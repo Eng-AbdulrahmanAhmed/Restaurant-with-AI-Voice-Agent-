@@ -32,17 +32,17 @@ export default function FanFav(){
             {
               name: "Classic Burger",
               description: "Beef, cheddar, lettuce, tomato, house sauce",
-              price: "$8.99",
+              price: "EGP 8.99",
             },
             {
               name: "Bacon Burger",
               description: "Beef, bacon, cheddar, lettuce, tomato",
-              price: "$10.99",
+              price: "EGP 10.99",
             },
             {
               name: "Mushroom Burger",
               description: "Beef, sautéed mushrooms, cheddar, lettuce",
-              price: "$9.99",
+              price: "EGP 9.99",
             },
           ].map((item) => (
             <article key={item.name} className="group flex flex-col">

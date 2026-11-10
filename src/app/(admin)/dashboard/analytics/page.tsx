@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -63,7 +63,7 @@ function buildSeries(days: number) {
 }
 
 function money(value: number) {
-  return "$" + Math.round(value).toLocaleString("en-US");
+  return "EGP " + Math.round(value).toLocaleString("en-US");
 }
 
 export default function AnalyticsPage() {
@@ -71,7 +71,8 @@ export default function AnalyticsPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timeoutId = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const days = RANGES.find((item) => item.key === range)?.days ?? 7;
@@ -88,7 +89,7 @@ export default function AnalyticsPage() {
   const kpiCards = [
     { label: "Revenue", value: money(kpis.revenue), change: "+12.4%", up: true, icon: Banknote, style: "bg-orange/10 text-orange" },
     { label: "Orders", value: kpis.orders.toLocaleString("en-US"), change: "+8.1%", up: true, icon: ShoppingBag, style: "bg-gold/15 text-gold" },
-    { label: "Avg. Order Value", value: "$" + kpis.average.toFixed(2), change: "+3.2%", up: true, icon: Receipt, style: "bg-lettuce/10 text-lettuce" },
+    { label: "Avg. Order Value", value: "EGP " + kpis.average.toFixed(2), change: "+3.2%", up: true, icon: Receipt, style: "bg-lettuce/10 text-lettuce" },
     { label: "Items Sold", value: kpis.items.toLocaleString("en-US"), change: "-1.6%", up: false, icon: Utensils, style: "bg-ink/5 text-brown" },
   ];
 
@@ -169,7 +170,7 @@ export default function AnalyticsPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="font-display text-base font-bold text-ink">Revenue trend</h2>
-            <p className="text-[11px] text-brown/60">{days} days · sample data</p>
+            <p className="text-[11px] text-brown/60">{days} days Â· sample data</p>
           </div>
           <p className="font-display text-xl font-black text-orange">{money(kpis.revenue)}</p>
         </div>
@@ -206,7 +207,7 @@ export default function AnalyticsPage() {
                     boxShadow: "0 14px 30px -18px rgba(36,23,8,0.45)",
                     fontSize: 12,
                   }}
-                  formatter={(value) => ["$" + Number(value).toLocaleString("en-US"), "Revenue"]}
+                  formatter={(value) => ["EGP " + Number(value).toLocaleString("en-US"), "Revenue"]}
                 />
 
                 <Area
@@ -249,7 +250,7 @@ export default function AnalyticsPage() {
                       border: "1px solid rgba(36,23,8,0.1)",
                       fontSize: 12,
                     }}
-                    formatter={(value) => ["$" + Number(value).toLocaleString("en-US"), "Revenue"]}
+                    formatter={(value) => ["EGP " + Number(value).toLocaleString("en-US"), "Revenue"]}
                   />
                   <Bar dataKey="revenue" fill="#F2690D" radius={[8, 8, 0, 0]} />
                 </BarChart>
@@ -283,3 +284,4 @@ export default function AnalyticsPage() {
     </main>
   );
 }
+

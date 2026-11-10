@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Poppins, Fraunces } from "next/font/google";
 import "@/app/globals.css";
 import {AuthProvider} from "@/context/AuthContext"
+import { CustomerCartBoundary } from "@/components/CustomerCartBoundary"
 
 /* ==================== STYLE MOD — OLD (Geist / Geist Mono) ====================
 import { Geist, Geist_Mono } from "next/font/google";
@@ -53,7 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           and the reference ink color. (undo: className="min-h-full flex flex-col bg-cream") */}
       <body className="flex min-h-full flex-col bg-cream font-sans text-ink">
         <AuthProvider>
-          {children}
+          <CustomerCartBoundary>{children}</CustomerCartBoundary>
         </AuthProvider>
       </body>
     </html>

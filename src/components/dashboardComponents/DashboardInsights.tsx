@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import {
   Layers,
@@ -9,7 +9,7 @@ import {
 import { getProducts } from "@/services/productService";
 
 /* ============================================================================
-   DASHBOARD INSIGHTS — real data only (no mock numbers).
+   DASHBOARD INSIGHTS â€” real data only (no mock numbers).
    Pulls the same catalog used by /dashboard/menu and derives:
      - item count per category
      - lowest / average / highest price
@@ -105,7 +105,7 @@ export default async function DashboardInsights() {
       index === bucketCount - 1 ? highest : lowest + bucketStep * (index + 1);
 
     return {
-      label: `$${from.toFixed(0)}–$${to.toFixed(0)}`,
+      label: `EGP ${from.toFixed(0)}–EGP ${to.toFixed(0)}`,
       count: 0,
     };
   });
@@ -250,7 +250,7 @@ export default async function DashboardInsights() {
                   {stat.label}
                 </p>
                 <p className="mt-0.5 font-display text-base font-bold text-ink transition-colors duration-200 group-hover:text-orange">
-                  ${stat.value.toFixed(2)}
+                  EGP {stat.value.toFixed(2)}
                 </p>
               </div>
             ))}
@@ -261,7 +261,7 @@ export default async function DashboardInsights() {
             <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-brown/60">
               <span>Price range</span>
               <span className="normal-case tracking-normal text-ink/70">
-                ${lowest.toFixed(2)} – ${highest.toFixed(2)}
+                EGP {lowest.toFixed(2)} – EGP {highest.toFixed(2)}
               </span>
             </div>
 
@@ -269,7 +269,7 @@ export default async function DashboardInsights() {
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-gold/70 via-orange/70 to-tomato/70" />
 
               <span
-                title={`Average $${average.toFixed(2)}`}
+                title={`Average EGP {average.toFixed(2)}`}
                 className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-orange-deep shadow-[0_2px_6px_rgba(36,23,8,0.3)] transition-transform duration-200 hover:scale-125"
                 style={{ left: `${averagePercent}%` }}
               />
@@ -333,7 +333,7 @@ export default async function DashboardInsights() {
                   </span>
 
                   <span className="shrink-0 font-display text-sm font-bold text-ink">
-                    ${item.price.toFixed(2)}
+                    EGP {item.price.toFixed(2)}
                   </span>
                 </div>
               ) : null
@@ -395,7 +395,7 @@ export default async function DashboardInsights() {
 
                   <div className="mt-1 flex items-center justify-between gap-2">
                     <span className="font-display text-base font-bold text-orange transition-transform duration-200 group-hover:scale-105">
-                      ${item.price.toFixed(2)}
+                      EGP {item.price.toFixed(2)}
                     </span>
                     <span className="rounded-full bg-lettuce/10 px-2 py-0.5 text-[9px] font-bold text-lettuce">
                       Available

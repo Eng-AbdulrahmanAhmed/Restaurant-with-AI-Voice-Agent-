@@ -34,7 +34,8 @@ export default function AddItemModal({ open, onClose, item }: Props) {
     const [variantRows, setVariantRows] = useState<VariantRow[]>(() => initialRows(item));
 
     useEffect(() => {
-        setVariantRows(initialRows(item));
+      const timeoutId = window.setTimeout(() => setVariantRows(initialRows(item)), 0);
+      return () => window.clearTimeout(timeoutId);
     }, [item]);
 
     const updateVariant = (id: string, patch: Partial<VariantRow>) => {

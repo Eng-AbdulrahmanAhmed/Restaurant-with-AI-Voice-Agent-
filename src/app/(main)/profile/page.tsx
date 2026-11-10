@@ -105,12 +105,12 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!user) {
-      setProfile(null);
-      return;
+      const timeoutId = window.setTimeout(() => setProfile(null), 0);
+      return () => window.clearTimeout(timeoutId);
     }
 
     let cancelled = false;
-    setProfileLoading(true);
+    const timeoutId = window.setTimeout(() => setProfileLoading(true), 0);
 
     (async () => {
       const { data } = await supabase
@@ -127,6 +127,7 @@ export default function ProfilePage() {
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timeoutId);
     };
   }, [user, supabase]);
 
@@ -324,7 +325,7 @@ export default function ProfilePage() {
                       {statusLabels[order.status]}
                     </span>
                     <span className="font-display text-lg font-bold text-orange">
-                      ${order.total.toFixed(2)}
+                      EGP {order.total.toFixed(2)}
                     </span>
                   </div>
                 </div>
