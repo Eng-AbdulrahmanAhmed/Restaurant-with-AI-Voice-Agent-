@@ -4,9 +4,10 @@
    logic yet). Darkened backdrop + centered scrollable panel. The trigger
    lives in DashboardNavbar, which owns the open/close toggle. */
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus, X, ImagePlus } from "lucide-react";
 import type { MenuItem } from "@/types/types";
+import { DEFAULT_CATEGORIES } from "@/services/productService";
 
 type VariantRow = { id: string; name: string; price: string; calories: string };
 
@@ -27,11 +28,21 @@ type Props = {
     onClose: () => void;
     /** When set, the popup runs in EDIT mode and pre-fills with this item. */
     item?: MenuItem | null;
+    /** Every category from the database; falls back to the core list. */
+    categories?: string[];
 };
 
-export default function AddItemModal({ open, onClose, item }: Props) {
+export default function AddItemModal({ open, onClose, item, categories = DEFAULT_CATEGORIES }: Props) {
     const editing = item != null;
     const [variantRows, setVariantRows] = useState<VariantRow[]>(() => initialRows(item));
+
+    // Keep the item's own category selectable even if it is missing from the list.
+    const categoryOptions = useMemo(() => {
+        const base = categories.length ? categories : DEFAULT_CATEGORIES;
+        const current = item?.category?.trim();
+
+        return current && !base.includes(current) ? [current, ...base] : base;
+    }, [categories, item]);
 
     useEffect(() => {
       const timeoutId = window.setTimeout(() => setVariantRows(initialRows(item)), 0);
@@ -180,18 +191,17 @@ export default function AddItemModal({ open, onClose, item }: Props) {
                                 id="add-item-category"
                                 defaultValue={
                                     item?.category != null &&
-                                    ["Burgers", "Sides", "Drinks", "Desserts"].includes(item.category)
+                                    categoryOptions.includes(item.category)
                                         ? item.category
-                                        : "Burgers"
+                                        : categoryOptions[0]
                                 }
                                 className="h-10 w-full rounded-full border border-ink/10 bg-cream px-3 text-xs
                                            font-medium text-ink outline-none transition focus:border-orange
                                            focus:bg-white focus:ring-2 focus:ring-orange/30"
                             >
-                                <option>Burgers</option>
-                                <option>Sides</option>
-                                <option>Drinks</option>
-                                <option>Desserts</option>
+                                {categoryOptions.map((category) => (
+                                    <option key={category}>{category}</option>
+                                ))}
                             </select>
                         </div>
                         <div>

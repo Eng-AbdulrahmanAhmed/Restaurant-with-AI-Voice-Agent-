@@ -9,7 +9,7 @@ import cupcakeArt from "@/assets/cupcake.svg";
 /* Fallback artwork when the DB doesn't return a product image.
    Matches the previous hardcoded resolver exactly. */
 const BURGER_ART = [burgerPhoto, heroImage];
-const ART_BY_CATEGORY: Record<MenuProduct["category"], string> = {
+const ART_BY_CATEGORY: Record<string, string> = {
   Burgers: burgerPhoto.src,
   Sides: friesPhoto.src,
   Drinks: strawberryShake.src,
@@ -36,7 +36,7 @@ type ProductRow = {
   image_url: string | null;
   is_available: boolean;
   preparation_time: number | null;
-  categories: Array<{ name: string }> | null;
+  categories: Array<{ name: string }> | { name: string } | null;
   product_variants: Array<{
     id: string | number;
     name: string | null;
@@ -93,12 +93,16 @@ export async function getPublicMenuProducts(): Promise<MenuProduct[]> {
 
     const primary = rawVariants.find((v) => v.calories != null) ?? rawVariants[0];
 
-    const rawCategory = product.categories?.[0]?.name ?? "Uncategorized";
-    const normalizedCategory =
-      rawCategory.charAt(0).toUpperCase() + rawCategory.slice(1).toLowerCase();
-    const category = (["Burgers", "Sides", "Drinks", "Desserts"].includes(normalizedCategory)
-      ? normalizedCategory
-      : "Burgers") as MenuProduct["category"];
+    // PostgREST returns a to-one embedded resource as an object, not an array.
+    // Reading it as an array made every product fall back to "Burgers".
+    const relatedCategory = Array.isArray(product.categories)
+      ? product.categories[0]
+      : product.categories;
+
+    const rawCategory = relatedCategory?.name?.trim() || "Uncategorized";
+    // Keep the category the DB actually stores (Burgers, Sides, Chicken, Pizza…)
+    // instead of collapsing unknown ones into "Burgers".
+    const category = rawCategory.charAt(0).toUpperCase() + rawCategory.slice(1);
 
     const storedImage = (product.image_url || "").trim();
     const imageUrl = storedImage
@@ -109,7 +113,7 @@ export async function getPublicMenuProducts(): Promise<MenuProduct[]> {
             .getPublicUrl(storedImage).data.publicUrl
       : category === "Burgers"
         ? getBurgerArt(Number(String(product.id).replace(/\D/g, "").slice(0, 1)) || 0)
-        : ART_BY_CATEGORY[category];
+        : (ART_BY_CATEGORY[category] ?? burgerPhoto.src);
 
     const prepMinutes =
       typeof product.preparation_time === "number" ? product.preparation_time : null;

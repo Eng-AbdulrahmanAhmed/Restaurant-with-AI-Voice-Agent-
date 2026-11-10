@@ -5,9 +5,10 @@
    The navbar opens it in ADD mode; each product card opens it in EDIT mode
    with the current item's values pre-filled. */
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import AddItemModal from "./AddItemModal";
 import type { MenuItem } from "@/types/types";
+import { DEFAULT_CATEGORIES, getCategories } from "@/services/productService";
 
 type AddItemContextValue = {
     openAddItem: () => void;
@@ -29,6 +30,22 @@ export default function AddItemProvider({ children }: { children: ReactNode }) {
     const [open, setOpen] = useState(false);
     // Current item in EDIT mode; null when the popup is in ADD mode.
     const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+    // Every category in the database, so the form can offer all of them.
+    const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
+
+    useEffect(() => {
+        let active = true;
+
+        getCategories()
+            .then((names) => {
+                if (active && names.length) setCategories(names);
+            })
+            .catch((error) => console.error("Could not load categories:", error));
+
+        return () => {
+            active = false;
+        };
+    }, []);
 
     const value: AddItemContextValue = {
         openAddItem: () => {
@@ -51,6 +68,7 @@ export default function AddItemProvider({ children }: { children: ReactNode }) {
                 key={editingItem?.id ?? "add"}
                 open={open}
                 item={editingItem}
+                categories={categories}
                 onClose={() => setOpen(false)}
             />
         </AddItemContext.Provider>

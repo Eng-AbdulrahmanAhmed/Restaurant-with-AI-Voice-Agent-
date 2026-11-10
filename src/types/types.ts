@@ -21,7 +21,7 @@ export type MenuProductVariant = {
 export type MenuProduct = {
   id: string;
   name: string;
-  category: "Burgers" | "Sides" | "Drinks" | "Desserts";
+  category: string;
   description: string;
   price: number;
   image: string;

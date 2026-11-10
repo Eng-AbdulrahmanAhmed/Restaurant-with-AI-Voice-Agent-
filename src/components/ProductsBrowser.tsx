@@ -1,7 +1,7 @@
 "use client";
 
 import { MAX_PRODUCT_PER_PAGE } from "@/Consts";
-import { getProducts } from "@/services/productService";
+import { getProducts, getCategories, DEFAULT_CATEGORIES } from "@/services/productService";
 import MenuCatalogGrid from "@/components/menuComponents/MenuCatalogGrid";
 import { useState, useEffect } from "react";
 import { type MenuItem } from "@/types/types";
@@ -16,6 +16,7 @@ export default function ProductsBrowser({ page , search , category }: { page: nu
   const [products, setProducts] = useState<MenuItem[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [searchInput, setSearchInput] = useState(search || "");
+  const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
   
   const pathname = usePathname()
   const router = useRouter()
@@ -38,9 +39,14 @@ export default function ProductsBrowser({ page , search , category }: { page: nu
 
   // const [searchInput, setSearchInput] = useState(search || "");
 
+// Serialise the params: the URLSearchParams object is a new instance on every
+// render, which used to re-run this effect forever (a replace loop that also
+// swallowed category navigations).
+const searchParamsKey = searchParams.toString();
+
 useEffect(() => {
   const timeout = setTimeout(() => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParamsKey);
 
     if (searchInput.trim()) {
       params.set("search", searchInput.trim());
@@ -50,12 +56,32 @@ useEffect(() => {
 
     params.set("page", "1");
 
-    router.replace(`${pathname}?${params.toString()}`);
+    const nextUrl = `${pathname}?${params.toString()}`;
+
+    if (nextUrl !== `${pathname}?${searchParamsKey}`) {
+      router.replace(nextUrl);
+    }
   }, 300);
 
   return () => clearTimeout(timeout);
-}, [searchInput, searchParams, pathname, router]);
+}, [searchInput, searchParamsKey, pathname, router]);
 
+
+  // Load every category from the database so the filters aren't limited to a
+  // hard-coded list.
+  useEffect(() => {
+    let active = true;
+
+    getCategories()
+      .then((names) => {
+        if (active && names.length) setCategories(names);
+      })
+      .catch((err) => console.error("Could not load categories:", err));
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / MAX_PRODUCT_PER_PAGE));
   const safePage = Math.min(Math.max(1, page), totalPages);
@@ -88,6 +114,7 @@ useEffect(() => {
     <section className="space-y-7 px-6 pt-10 pb-12 lg:px-10">
       <MenuCatalogHeader
         activeCategory={category || "All Items"}
+        categories={categories}
         onCategoryChange={handleCategoryChange}
         search={searchInput}
         onSearchChange={setSearchInput} 

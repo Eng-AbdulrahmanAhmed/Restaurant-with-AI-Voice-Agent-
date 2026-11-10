@@ -1,5 +1,41 @@
 import { createClient } from "@/lib/supabase/client";
 
+/** Shown until (or if) the categories table cannot be read. */
+export const DEFAULT_CATEGORIES = ["Burgers", "Sides", "Drinks", "Desserts"];
+
+/** Canonical display order; any other category is appended alphabetically. */
+const CORE_CATEGORY_ORDER = DEFAULT_CATEGORIES;
+
+/**
+ * Every category that exists in the database, core ones first.
+ * Keeps the dashboard filters and the item form in sync with the table
+ * instead of a hard-coded list that drifts (e.g. Chicken, Pizza).
+ */
+export async function getCategories(): Promise<string[]> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase.from("categories").select("name");
+
+    if (error) {
+        throw error;
+    }
+
+    const names = [
+        ...new Set(
+            (data ?? [])
+                .map((row) => (row.name ?? "").trim())
+                .filter(Boolean)
+        ),
+    ];
+
+    const core = CORE_CATEGORY_ORDER.filter((name) => names.includes(name));
+    const extra = names
+        .filter((name) => !CORE_CATEGORY_ORDER.includes(name))
+        .sort((a, b) => a.localeCompare(b));
+
+    return [...core, ...extra];
+}
+
 export async function getProducts({
     page = 1,
     MAX_PRODUCT_PER_PAGE = 6,

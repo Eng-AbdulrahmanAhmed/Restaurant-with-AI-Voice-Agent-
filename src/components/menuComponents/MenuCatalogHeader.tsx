@@ -2,7 +2,7 @@
 "use client";
 
 
-import { Utensils, Search, LayoutGrid, Hamburger, Salad, CupSoda, IceCreamBowl } from "lucide-react";
+import { Utensils, Search, LayoutGrid, Hamburger, Salad, CupSoda, IceCreamBowl, Drumstick, Pizza } from "lucide-react";
 import Image from "next/image";
 import type { StaticImageData } from "next/image";
 
@@ -12,16 +12,19 @@ type Category = {
   lucideIcon?: typeof LayoutGrid;
 };
 
-const categories: Category[] = [
-  { label: "All Items", lucideIcon: LayoutGrid }, // STYLE MOD — same icon as navbar "Menu Items"
-  { label: "Burgers", lucideIcon: Hamburger },
-  { label: "Sides", lucideIcon: Salad },
-  { label: "Drinks", lucideIcon: CupSoda },
-  { label: "Desserts", lucideIcon: IceCreamBowl },
-];
+/** Icons for the known categories; any new category gets the generic icon. */
+const CATEGORY_ICONS: Record<string, typeof LayoutGrid> = {
+  Burgers: Hamburger,
+  Sides: Salad,
+  Drinks: CupSoda,
+  Desserts: IceCreamBowl,
+  Chicken: Drumstick,
+  Pizza,
+};
 
 type Props = {
   activeCategory: string;
+  categories: string[];
   onCategoryChange:(category:string) => void;
   search: string;
   onSearchChange: (value: string) => void;
@@ -29,10 +32,19 @@ type Props = {
 
 export default function MenuCatalogHeader(
   {activeCategory,
+  categories,
   onCategoryChange,
   search,
   onSearchChange,}
 :Props){
+  const categoryItems: Category[] = [
+    { label: "All Items", lucideIcon: LayoutGrid }, // STYLE MOD — same icon as navbar "Menu Items"
+    ...categories.map((label) => ({
+      label,
+      lucideIcon: CATEGORY_ICONS[label] ?? Utensils,
+    })),
+  ];
+
   return (
     <section className="space-y-8">
       <div className="flex flex-col items-center space-y-3 text-center">
@@ -58,7 +70,7 @@ export default function MenuCatalogHeader(
                    lg:flex-row lg:items-center lg:justify-between"
       >
         <div className="flex flex-wrap items-center gap-1.5">
-          {categories.map(({ label, icon, lucideIcon }) => (
+          {categoryItems.map(({ label, icon, lucideIcon }) => (
             <button
               key={label}
               onClick={() => onCategoryChange(label)}

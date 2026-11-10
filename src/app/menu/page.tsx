@@ -41,7 +41,10 @@ import {
   PhoneOff,
   VolumeX,
   AlertCircle,
+  Drumstick,
+  Pizza,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import burgerLogo from "@/assets/logo-no-background.png";
 import heroImage from "@/assets/hero-image.png";
 
@@ -66,6 +69,12 @@ const CATEGORIES = [
   { label: "Drinks", icon: Coffee },
   { label: "Desserts", icon: IceCream },
 ] as const;
+
+// Icons for categories that exist in the database but not in the core rail.
+const EXTRA_CATEGORY_ICONS: Record<string, LucideIcon> = {
+  Chicken: Drumstick,
+  Pizza,
+};
 
 // QUICK STATS â€” same card anatomy as DashboardOverview (tinted icon chips).
 const RESTAURANT_STATS = [
@@ -392,6 +401,22 @@ export default function CustomerMenuPage() {
   // --------------------------------------------------------------------------
   // Filtered Products
   // --------------------------------------------------------------------------
+  // Core rail + any extra category the database returns, so nothing becomes
+  // unreachable when a new category is added (Chicken, Pizza, …).
+  const categoryFilters = useMemo<{ label: string; icon: LucideIcon }[]>(() => {
+    const core = CATEGORIES.map(({ label, icon }) => ({
+      label: label as string,
+      icon: icon as LucideIcon,
+    }));
+    const known = new Set(core.map((category) => category.label));
+    const extra = [...new Set(products.map((product) => product.category))]
+      .filter((label) => label && !known.has(label))
+      .sort((a, b) => a.localeCompare(b))
+      .map((label) => ({ label, icon: EXTRA_CATEGORY_ICONS[label] ?? Utensils }));
+
+    return [...core, ...extra];
+  }, [products]);
+
   const filteredProducts = useMemo(() => {
     return products.filter((item) => {
       const matchCat =
@@ -568,7 +593,7 @@ export default function CustomerMenuPage() {
 
               {/* Category list with count badges */}
               <div className="mt-4 space-y-1">
-                {CATEGORIES.map(({ label, icon: Icon }) => {
+                {categoryFilters.map(({ label, icon: Icon }) => {
                   const active = activeCategory === label;
                   const count =
                     label === "All Items"
