@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
@@ -47,6 +47,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import burgerLogo from "@/assets/logo-no-background.png";
 import heroImage from "@/assets/hero-image.png";
+import { createClient } from "@/lib/supabase/client";
 
 /* ============================================================================
    STYLE MOD (menu design v3, single file only)
@@ -275,7 +276,8 @@ export default function CustomerMenuPage() {
 
   useEffect(() => {
     let mounted = true;
-    getPublicMenuProducts()
+    const supabase = createClient();
+    getPublicMenuProducts(supabase)
       .then((items) => {
         if (mounted) setProducts(items);
       })

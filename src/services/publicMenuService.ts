@@ -5,6 +5,7 @@ import heroImage from "@/assets/hero-image.png";
 import friesPhoto from "@/assets/fries-photo.png";
 import strawberryShake from "@/assets/strawberry-shake.png";
 import cupcakeArt from "@/assets/cupcake.svg";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 /* Fallback artwork when the DB doesn't return a product image.
    Matches the previous hardcoded resolver exactly. */
@@ -48,8 +49,8 @@ type ProductRow = {
   is_spicy?: boolean;
 };
 
-export async function getPublicMenuProducts(): Promise<MenuProduct[]> {
-  const supabase = createClient();
+export async function getPublicMenuProducts(supabase : SupabaseClient): Promise<MenuProduct[]> {
+  // const supabase = createClient();
 
   const { data, error } = await supabase
     .from("products")
