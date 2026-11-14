@@ -57,13 +57,13 @@ export default function DashboardOrders() {
             className="group/order -mx-2 flex items-center justify-between gap-3 rounded-xl px-2 py-2.5 transition-colors duration-200 hover:bg-cream/60"
           >
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-ink">
+              <p className="truncate text-sm font-semibold tabular-nums text-ink">
                 {order.id}{" "}
                 <span className="font-normal text-brown/50">
                   · {order.customer}
                 </span>
               </p>
-              <p className="text-[11px] text-brown/70">
+              <p className="text-[11px] tabular-nums text-brown/70">
                 {order.items} {order.items === 1 ? "item" : "items"}
               </p>
             </div>
@@ -75,7 +75,7 @@ export default function DashboardOrders() {
                 {order.status}
               </span>
 
-              <span className="w-14 text-right font-display text-sm font-bold text-ink">
+              <span className="w-14 text-right font-display text-sm font-bold tabular-nums text-ink">
                 EGP {order.total.toFixed(2)}
               </span>
             </div>

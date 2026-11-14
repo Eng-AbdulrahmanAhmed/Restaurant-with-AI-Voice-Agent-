@@ -163,9 +163,14 @@ export default function CustomerMenuPage() {
 
   // Cart State
   const { cart, addToCart, updateCartQty, removeCartItem, clearCart, totalItemCount, subtotal } = useCart();
+  const grandTotal = subtotal > 0 ? subtotal : 0;
   const router = useRouter();
   const { status, error, messages, micEnabled, audioBlocked, connect, disconnect, toggleMic, enableAudio } =
-    useLiveKitAssistant();
+    useLiveKitAssistant(() => ({
+      items: cart,
+      total: grandTotal,
+      currency: "EGP",
+    }));
 
   const assistantStatusLabel =
     status === "error"
@@ -330,8 +335,10 @@ export default function CustomerMenuPage() {
   // --------------------------------------------------------------------------
   // Cart Handlers
   // --------------------------------------------------------------------------
-  const tax = subtotal * 0.0825;
-  const grandTotal = subtotal > 0 ? subtotal + tax : 0;
+  // Tax temporarily disabled so the app does not charge it.
+  // const tax = subtotal * 0.0825;
+  // const grandTotal = subtotal > 0 ? subtotal + tax : 0;
+  // const grandTotal = subtotal > 0 ? subtotal : 0;
 
   // --------------------------------------------------------------------------
   // Voice AI Parser
@@ -969,15 +976,20 @@ export default function CustomerMenuPage() {
 
                 {/* Billing breakdown */}
                 <div className="space-y-1.5 border-t border-ink/10 pt-3 text-xs font-semibold text-brown">
+                  {/* Subtotal hidden while tax is disabled because it equals the total.
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span className="text-ink">EGP {subtotal.toFixed(2)}</span>
                   </div>
+                  */}
+                  {/* Tax temporarily disabled so the app does not charge it.
                   <div className="flex justify-between">
                     <span>Estimated Tax (8.25%)</span>
                     <span className="text-ink">EGP {tax.toFixed(2)}</span>
                   </div>
-                  <div className="flex items-baseline justify-between border-t border-ink/10 pt-2 text-sm font-bold text-ink">
+                  */}
+                  {/* The total no longer needs its own top border while subtotal is hidden. */}
+                  <div className="flex items-baseline justify-between text-sm font-bold text-ink">
                     <span>Total Due</span>
                     <span className="font-display text-2xl font-bold text-orange">
                       EGP {grandTotal.toFixed(2)}

@@ -151,10 +151,10 @@ export default function AnalyticsPage() {
               <Icon size={17} strokeWidth={2} />
             </div>
             <p className="mt-3 text-[11px] font-medium text-brown/70 transition-colors duration-200 group-hover:text-orange-deep">{label}</p>
-            <p className="mt-0.5 font-display text-2xl font-bold text-ink transition-colors duration-200 group-hover:text-orange">{value}</p>
+            <p className="mt-0.5 font-display text-2xl font-bold tabular-nums text-ink transition-colors duration-200 group-hover:text-orange">{value}</p>
             <p
               className={
-                "mt-1 inline-flex items-center gap-1 text-[10px] font-bold " +
+                "mt-1 inline-flex items-center gap-1 text-[10px] font-bold tabular-nums " +
                 (up ? "text-lettuce" : "text-tomato")
               }
             >
@@ -170,9 +170,9 @@ export default function AnalyticsPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="font-display text-base font-bold text-ink">Revenue trend</h2>
-            <p className="text-[11px] text-brown/60">{days} days Â· sample data</p>
+            <p className="text-[11px] tabular-nums text-brown/60">{days} days Â· sample data</p>
           </div>
-          <p className="font-display text-xl font-black text-orange">{money(kpis.revenue)}</p>
+          <p className="font-display text-xl font-black tabular-nums text-orange">{money(kpis.revenue)}</p>
         </div>
 
         <div className="mt-4 h-56 w-full">
@@ -206,6 +206,7 @@ export default function AnalyticsPage() {
                     border: "1px solid rgba(36,23,8,0.1)",
                     boxShadow: "0 14px 30px -18px rgba(36,23,8,0.45)",
                     fontSize: 12,
+                    fontVariantNumeric: "tabular-nums",
                   }}
                   formatter={(value) => ["EGP " + Number(value).toLocaleString("en-US"), "Revenue"]}
                 />
@@ -249,6 +250,7 @@ export default function AnalyticsPage() {
                       borderRadius: 12,
                       border: "1px solid rgba(36,23,8,0.1)",
                       fontSize: 12,
+                      fontVariantNumeric: "tabular-nums",
                     }}
                     formatter={(value) => ["EGP " + Number(value).toLocaleString("en-US"), "Revenue"]}
                   />
@@ -268,14 +270,14 @@ export default function AnalyticsPage() {
           <ol className="mt-4 space-y-2.5">
             {topItems.map((item, index) => (
               <li key={item.name} className="flex items-center gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange/10 text-[10px] font-bold text-orange-deep">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange/10 text-[10px] font-bold tabular-nums text-orange-deep">
                   {index + 1}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-xs font-semibold text-ink">{item.name}</p>
-                  <p className="text-[10px] text-brown/60">{item.orders} orders</p>
+                  <p className="text-[10px] tabular-nums text-brown/60">{item.orders} orders</p>
                 </div>
-                <span className="font-display text-sm font-bold text-ink">{money(item.revenue)}</span>
+                <span className="font-display text-sm font-bold tabular-nums text-ink">{money(item.revenue)}</span>
               </li>
             ))}
           </ol>

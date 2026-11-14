@@ -248,7 +248,7 @@ export default function LiveOrdersPage() {
               <Icon size={17} strokeWidth={2} />
             </div>
             <p className="mt-3 text-[11px] font-medium text-brown/70 transition-colors duration-200 group-hover:text-orange-deep">{label}</p>
-            <p className="mt-0.5 font-display text-2xl font-bold text-ink transition-colors duration-200 group-hover:text-orange">{value}</p>
+            <p className="mt-0.5 font-display text-2xl font-bold tabular-nums text-ink transition-colors duration-200 group-hover:text-orange">{value}</p>
           </div>
         ))}
       </div>
@@ -303,14 +303,14 @@ export default function LiveOrdersPage() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-display text-base font-bold text-ink">
+                  <h2 className="font-display text-base font-bold tabular-nums text-ink">
                     {order.id}
                     <span className="ml-2 text-[11px] font-medium text-brown/60">
                       {order.type}
                       {order.table ? " · " + order.table : ""}
                     </span>
                   </h2>
-                  <p className="mt-0.5 inline-flex items-center gap-1.5 text-[11px] text-brown/60">
+                  <p className="mt-0.5 inline-flex items-center gap-1.5 text-[11px] tabular-nums text-brown/60">
                     <Clock size={12} strokeWidth={2.5} />
                     {order.placed}
                   </p>
@@ -326,9 +326,9 @@ export default function LiveOrdersPage() {
                 {order.items.map((item) => (
                   <li key={item.name} className="flex items-center justify-between gap-2 text-xs">
                     <span className="text-ink/80">
-                      <span className="font-semibold text-ink">{item.qty}x</span> {item.name}
+                      <span className="font-semibold tabular-nums text-ink">{item.qty}x</span> {item.name}
                     </span>
-                    <span className="font-semibold text-brown/70">
+                    <span className="font-semibold tabular-nums text-brown/70">
                       {"EGP " + (item.qty * item.price).toFixed(2)}
                     </span>
                   </li>
@@ -336,10 +336,10 @@ export default function LiveOrdersPage() {
               </ul>
 
               <div className="mt-3 flex items-center justify-between border-t border-ink/10 pt-3">
-                <span className="text-[11px] font-medium text-brown/60">
+                <span className="text-[11px] font-medium tabular-nums text-brown/60">
                   {order.items.reduce((sum, item) => sum + item.qty, 0)} items
                 </span>
-                <span className="font-display text-lg font-bold text-ink">
+                <span className="font-display text-lg font-bold tabular-nums text-ink">
                   {"EGP " + orderTotal(order).toFixed(2)}
                 </span>
               </div>

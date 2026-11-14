@@ -153,7 +153,7 @@ export default function ReservationsPage() {
               <Icon size={17} strokeWidth={2} />
             </div>
             <p className="mt-3 text-[11px] font-medium text-brown/70 transition-colors duration-200 group-hover:text-orange-deep">{label}</p>
-            <p className="mt-0.5 font-display text-2xl font-bold text-ink transition-colors duration-200 group-hover:text-orange">{value}</p>
+            <p className="mt-0.5 font-display text-2xl font-bold tabular-nums text-ink transition-colors duration-200 group-hover:text-orange">{value}</p>
           </div>
         ))}
       </div>
@@ -227,15 +227,15 @@ export default function ReservationsPage() {
                     via {reservation.source} · {reservation.date} · {reservation.time}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-brown/70">
-                    <span className="inline-flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 tabular-nums">
                       <Phone size={12} strokeWidth={2.5} />
                       {reservation.phone}
                     </span>
-                    <span className="inline-flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 tabular-nums">
                       <Users size={12} strokeWidth={2.5} />
                       {reservation.guests} guests
                     </span>
-                    <span className="inline-flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 tabular-nums">
                       <Utensils size={12} strokeWidth={2.5} />
                       {reservation.table}
                     </span>

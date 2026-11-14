@@ -104,7 +104,7 @@ export default function MenuCatalogGrid({
                     {item.description || "No description available."}
                   </p>
 
-                  <p className="mt-2 font-display text-xl font-bold text-orange">
+                  <p className="mt-2 font-display text-xl font-bold tabular-nums text-orange">
                     EGP {item.price.toFixed(2)}
                   </p>
 
@@ -117,7 +117,7 @@ export default function MenuCatalogGrid({
                         >
                           <span className="h-1 w-1 shrink-0 rounded-full bg-orange" />
                           <span className="truncate">{variant.name}</span>
-                          <span className="ml-auto shrink-0 text-brown/60">
+                          <span className="ml-auto shrink-0 tabular-nums text-brown/60">
                             EGP {variant.price.toFixed(2)}
                             {variant.calories != null && (
                               <span className="text-brown/40">
@@ -128,7 +128,7 @@ export default function MenuCatalogGrid({
                         </li>
                       ))}
                       {item.variants.length > 3 && (
-                        <li className="text-[10px] font-medium text-brown/50">
+                        <li className="text-[10px] font-medium tabular-nums text-brown/50">
                           + {item.variants.length - 3} more
                         </li>
                       )}
@@ -144,7 +144,7 @@ export default function MenuCatalogGrid({
                 <div className="flex items-center gap-2">
                   <span
                     className={`group inline-flex items-center gap-1.5 rounded-full
-                                px-3 py-1.5 text-[11px] font-semibold transition-colors ${
+                                px-3 py-1.5 text-[11px] font-semibold tabular-nums transition-colors ${
                                   false
                                     ? "bg-tomato/10 text-tomato"
                                     : "bg-cream-deep text-brown hover:bg-tomato/10 hover:text-tomato"

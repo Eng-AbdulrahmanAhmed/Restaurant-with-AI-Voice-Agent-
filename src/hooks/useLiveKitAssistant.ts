@@ -12,6 +12,7 @@ import {
   type RemoteTrackPublication,
 } from "livekit-client";
 
+import type { CartItem } from "@/types/cart";
 export type AssistantStatus =
   | "disconnected"
   | "connecting"
@@ -36,7 +37,13 @@ const AGENT_JOIN_TIMEOUT_MS = 30_000;
  * dispatched into it, plays the agent's audio, and exposes the session state
  * the UI needs to show that something is really happening.
  */
-export function useLiveKitAssistant() {
+export function useLiveKitAssistant(
+  getCart: () => {
+    items: CartItem[];
+    total: number;
+    currency: string;
+  }
+) {
   const roomRef = useRef<Room | null>(null);
   const audioElementsRef = useRef<HTMLAudioElement[]>([]);
   const attachedTrackSidsRef = useRef<Set<string>>(new Set());
@@ -45,6 +52,7 @@ export function useLiveKitAssistant() {
   const agentSpeakingRef = useRef(false);
   const micEnabledRef = useRef(false);
   const agentTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const getCartRef = useRef(getCart);
 
   const [status, setStatus] = useState<AssistantStatus>("disconnected");
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +60,10 @@ export function useLiveKitAssistant() {
   const [micEnabled, setMicEnabled] = useState(false);
   const [audioBlocked, setAudioBlocked] = useState(false);
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
+
+  useEffect(() => {
+    getCartRef.current = getCart;
+  }, [getCart]);
 
   const clearAgentTimeout = useCallback(() => {
     if (agentTimeoutRef.current !== null) {
@@ -251,9 +263,28 @@ export function useLiveKitAssistant() {
       });
 
       await roomInstance.connect(data.serverUrl, data.participantToken);
+      roomInstance.registerRpcMethod("getCart", async () => {
+      try {
+        console.log("getCart RPC called");
+
+        const currentCart = getCartRef.current();
+
+        console.log("Current cart:", currentCart);
+
+        const response = JSON.stringify(currentCart);
+
+        console.log("Cart JSON:", response);
+
+        return response;
+      } catch (error) {
+        console.error("getCart RPC handler failed:", error);
+        throw error;
+      }
+    });
       connectingRef.current = false;
       setStatus("waiting");
 
+      
       agentTimeoutRef.current = setTimeout(() => {
         if (!agentJoinedRef.current) {
           setError(

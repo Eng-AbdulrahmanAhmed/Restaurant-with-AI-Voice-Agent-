@@ -78,11 +78,11 @@ const stats = [
                 {stat.title}
               </p>
 
-              <h3 className="mt-0.5 truncate font-display text-lg font-bold text-ink transition-colors duration-200 group-hover:text-orange">
+              <h3 className="mt-0.5 truncate font-display text-lg font-bold tabular-nums text-ink transition-colors duration-200 group-hover:text-orange">
                 {stat.value}
               </h3>
 
-              <p className="mt-0.5 truncate text-[11px] text-brown/50">
+              <p className="mt-0.5 truncate text-[11px] tabular-nums text-brown/50">
                 {stat.detail}
               </p>
             </div>

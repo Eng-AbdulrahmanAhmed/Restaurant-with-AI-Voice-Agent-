@@ -157,7 +157,7 @@ export default async function DashboardInsights() {
               <h3 className="font-display text-base font-bold text-ink">
                 Items by Category
               </h3>
-              <p className="text-[11px] text-brown/70">
+              <p className="text-[11px] tabular-nums text-brown/70">
                 {total} available {total === 1 ? "item" : "items"}
               </p>
             </div>
@@ -189,10 +189,10 @@ export default async function DashboardInsights() {
                       </span>
 
                       <span className="flex shrink-0 items-center gap-2">
-                        <span className="text-[10px] font-bold text-orange opacity-0 transition-opacity duration-200 group-hover/row:opacity-100">
+                        <span className="text-[10px] font-bold tabular-nums text-orange opacity-0 transition-opacity duration-200 group-hover/row:opacity-100">
                           {percent.toFixed(0)}%
                         </span>
-                        <span className="font-display text-sm font-bold text-ink transition-transform duration-200 group-hover/row:scale-110">
+                        <span className="font-display text-sm font-bold tabular-nums text-ink transition-transform duration-200 group-hover/row:scale-110">
                           {category.count}
                         </span>
                       </span>
@@ -217,7 +217,7 @@ export default async function DashboardInsights() {
             <span className="font-semibold uppercase tracking-wider text-brown/60">
               Categories
             </span>
-            <span className="font-display text-sm font-bold text-ink">
+            <span className="font-display text-sm font-bold tabular-nums text-ink">
               {categories.length}
             </span>
           </div>
@@ -249,7 +249,7 @@ export default async function DashboardInsights() {
                 <p className="text-[9px] font-bold uppercase tracking-wider text-brown/60 transition-colors duration-200 group-hover:text-orange-deep">
                   {stat.label}
                 </p>
-                <p className="mt-0.5 font-display text-base font-bold text-ink transition-colors duration-200 group-hover:text-orange">
+                <p className="mt-0.5 font-display text-base font-bold tabular-nums text-ink transition-colors duration-200 group-hover:text-orange">
                   EGP {stat.value.toFixed(2)}
                 </p>
               </div>
@@ -260,7 +260,7 @@ export default async function DashboardInsights() {
           <div className="mt-4">
             <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-brown/60">
               <span>Price range</span>
-              <span className="normal-case tracking-normal text-ink/70">
+              <span className="normal-case tracking-normal tabular-nums text-ink/70">
                 EGP {lowest.toFixed(2)} – EGP {highest.toFixed(2)}
               </span>
             </div>
@@ -289,10 +289,10 @@ export default async function DashboardInsights() {
                 return (
                   <div key={index} className="group/bucket">
                     <div className="flex items-center justify-between text-[10px] font-semibold">
-                      <span className="text-brown/70 transition-colors duration-200 group-hover/bucket:text-orange-deep">
+                      <span className="tabular-nums text-brown/70 transition-colors duration-200 group-hover/bucket:text-orange-deep">
                         {bucket.label}
                       </span>
-                      <span className="text-ink/70">{bucket.count}</span>
+                      <span className="tabular-nums text-ink/70">{bucket.count}</span>
                     </div>
 
                     <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-cream-deep">
@@ -332,7 +332,7 @@ export default async function DashboardInsights() {
                     {item.name}
                   </span>
 
-                  <span className="shrink-0 font-display text-sm font-bold text-ink">
+                  <span className="shrink-0 font-display text-sm font-bold tabular-nums text-ink">
                     EGP {item.price.toFixed(2)}
                   </span>
                 </div>
@@ -394,7 +394,7 @@ export default async function DashboardInsights() {
                   </h4>
 
                   <div className="mt-1 flex items-center justify-between gap-2">
-                    <span className="font-display text-base font-bold text-orange transition-transform duration-200 group-hover:scale-105">
+                    <span className="font-display text-base font-bold tabular-nums text-orange transition-transform duration-200 group-hover:scale-105">
                       EGP {item.price.toFixed(2)}
                     </span>
                     <span className="rounded-full bg-lettuce/10 px-2 py-0.5 text-[9px] font-bold text-lettuce">

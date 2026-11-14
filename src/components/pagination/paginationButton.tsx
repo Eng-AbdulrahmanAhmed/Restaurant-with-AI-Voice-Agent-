@@ -44,7 +44,7 @@ export default function PaginationButton({
 			aria-current={isActive ? 'page' : undefined}
 			aria-label={ariaLabel}
 			disabled={disabled}
-			className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-200 ${
+			className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold tabular-nums transition-all duration-200 ${
 				isActive
 					? 'bg-ink text-cream shadow-[0_4px_12px_-4px_rgba(36,23,8,0.4)]'
 					: 'border border-ink/10 bg-white text-brown hover:border-orange hover:text-orange'

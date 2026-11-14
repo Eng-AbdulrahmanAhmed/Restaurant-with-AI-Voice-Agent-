@@ -71,11 +71,11 @@ export default function DashboardAnalytics() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-end gap-2.5">
-        <p className="font-display text-2xl font-black tracking-tight text-ink">
+        <p className="font-display text-2xl font-black tabular-nums tracking-tight text-ink">
           EGP {totalSales.toLocaleString()}
         </p>
 
-        <span className="mb-0.5 inline-flex items-center gap-1 rounded-full bg-lettuce/10 px-2 py-0.5 text-[10px] font-bold text-lettuce">
+        <span className="mb-0.5 inline-flex items-center gap-1 rounded-full bg-lettuce/10 px-2 py-0.5 text-[10px] font-bold tabular-nums text-lettuce">
           <TrendingUp size={11} strokeWidth={2.5} />
           +12.4%
         </span>
@@ -120,6 +120,7 @@ export default function DashboardAnalytics() {
                   border: "1px solid rgba(36,23,8,0.1)",
                   boxShadow: "0 14px 30px -18px rgba(36,23,8,0.45)",
                   fontSize: 12,
+                  fontVariantNumeric: "tabular-nums",
                 }}
                 labelStyle={{ color: "#6F5230", fontWeight: 600 }}
                 formatter={(value) => [`EGP ${value}`, "Sales"]}

@@ -223,7 +223,7 @@ export default function AddItemModal({ open, onClose, item, categories = DEFAULT
                                     defaultValue={item?.price ?? undefined}
                                     placeholder="0.00"
                                     className="h-10 w-full rounded-full border border-ink/10 bg-cream pl-8 pr-3 text-xs
-                                               font-medium text-ink outline-none transition placeholder:text-brown/50
+                                               font-medium tabular-nums text-ink outline-none transition placeholder:text-brown/50
                                                focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
                                 />
                             </div>
@@ -242,7 +242,7 @@ export default function AddItemModal({ open, onClose, item, categories = DEFAULT
                                 defaultValue={item?.stock ?? undefined}
                                 placeholder="0"
                                 className="h-10 w-full rounded-full border border-ink/10 bg-cream px-4 text-xs
-                                           font-medium text-ink outline-none transition placeholder:text-brown/50
+                                           font-medium tabular-nums text-ink outline-none transition placeholder:text-brown/50
                                            focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
                             />
                         </div>
@@ -277,7 +277,7 @@ export default function AddItemModal({ open, onClose, item, categories = DEFAULT
                                             onChange={(e) => updateVariant(row.id, { price: e.target.value })}
                                             aria-label="Variant price"
                                             placeholder="0.00"
-                                            className="h-9 w-20 rounded-xl border border-ink/10 bg-white pl-5 pr-2 text-xs font-medium text-ink outline-none transition placeholder:text-brown/50 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
+                                            className="h-9 w-20 rounded-xl border border-ink/10 bg-white pl-5 pr-2 text-xs font-medium tabular-nums text-ink outline-none transition placeholder:text-brown/50 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
                                         />
                                     </div>
                                     <input
@@ -287,7 +287,7 @@ export default function AddItemModal({ open, onClose, item, categories = DEFAULT
                                         onChange={(e) => updateVariant(row.id, { calories: e.target.value })}
                                         aria-label="Variant calories"
                                         placeholder="kcal"
-                                        className="h-9 w-20 rounded-xl border border-ink/10 bg-white px-2 text-xs font-medium text-ink outline-none transition placeholder:text-brown/50 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
+                                        className="h-9 w-20 rounded-xl border border-ink/10 bg-white px-2 text-xs font-medium tabular-nums text-ink outline-none transition placeholder:text-brown/50 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
                                     />
                                     <button
                                         type="button"
