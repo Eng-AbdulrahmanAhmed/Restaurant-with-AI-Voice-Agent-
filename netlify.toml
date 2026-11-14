@@ -1,0 +1,5 @@
+[build.environment]
+  # The Supabase publishable key and URL are public, client-side values (NEXT_PUBLIC_*).
+  # SECRETS_SCAN_OMIT_KEYS lists itself so its own value (a list of variable names)
+  # is not treated as a secret and matched against code that references those names.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,NEXT_PUBLIC_SUPABASE_URL,SECRETS_SCAN_OMIT_KEYS"
