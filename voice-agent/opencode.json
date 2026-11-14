@@ -1,9 +1,0 @@
-{
-  "mcp": {
-    "livekit-docs": {
-      "enabled": true,
-      "type": "remote",
-      "url": "https://docs.livekit.io/mcp"
-    }
-  }
-}
