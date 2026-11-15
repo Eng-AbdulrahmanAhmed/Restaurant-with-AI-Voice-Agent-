@@ -1,5 +1,5 @@
 "use client";
-
+import { createClient } from "@/lib/supabase/client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ConnectionState,
@@ -11,8 +11,9 @@ import {
   type RemoteTrack,
   type RemoteTrackPublication,
 } from "livekit-client";
-
+import type { MenuProduct } from "@/types/types";
 import type { CartItem } from "@/types/cart";
+import { getPublicMenuProducts } from "@/services/publicMenuService";
 export type AssistantStatus =
   | "disconnected"
   | "connecting"
@@ -37,12 +38,20 @@ const AGENT_JOIN_TIMEOUT_MS = 30_000;
  * dispatched into it, plays the agent's audio, and exposes the session state
  * the UI needs to show that something is really happening.
  */
+type CartActions = {
+  addToCart: (product: MenuProduct, quantity?: number, variantId?: string) => void;
+  updateCartQty: (id: string, delta: number) => void;
+  removeCartItem: (id: string) => void;
+  clearCart: () => void;
+};
+
 export function useLiveKitAssistant(
   getCart: () => {
     items: CartItem[];
     total: number;
     currency: string;
-  }
+  },
+  cartActions: CartActions
 ) {
   const roomRef = useRef<Room | null>(null);
   const audioElementsRef = useRef<HTMLAudioElement[]>([]);
@@ -53,6 +62,26 @@ export function useLiveKitAssistant(
   const micEnabledRef = useRef(false);
   const agentTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const getCartRef = useRef(getCart);
+  // const productsRef = useRef(cartActions.products);
+
+  // useEffect(() => {
+  //   productsRef.current = cartActions.products;
+  // }, [cartActions.products]);
+  const menuProductsRef = useRef<MenuProduct[] | null>(null);
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+  
+  const getMenuProducts = async () => {
+    if (menuProductsRef.current !== null) {
+      return menuProductsRef.current;
+    }
+    const products = await getPublicMenuProducts(supabaseRef.current!);
+    menuProductsRef.current = products;
+    return products;
+  };
+
+  if (supabaseRef.current === null) {
+    supabaseRef.current = createClient();
+  }
 
   const [status, setStatus] = useState<AssistantStatus>("disconnected");
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +89,7 @@ export function useLiveKitAssistant(
   const [micEnabled, setMicEnabled] = useState(false);
   const [audioBlocked, setAudioBlocked] = useState(false);
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
-
+ 
   useEffect(() => {
     getCartRef.current = getCart;
   }, [getCart]);
@@ -281,10 +310,57 @@ export function useLiveKitAssistant(
         throw error;
       }
     });
+    roomInstance.registerRpcMethod("searchMenu", async (data) => {
+      console.log("Browser searchMenu RPC called");
+
+      const { query } = JSON.parse(data.payload);
+
+      const normalizedQuery = query.trim().toLowerCase();
+
+      if (!normalizedQuery) {
+        return JSON.stringify([]);
+    }
+    const products = await getMenuProducts();
+    const matches = products.filter((product) =>
+      product.name.toLowerCase().includes(normalizedQuery)
+    );
+    return JSON.stringify(matches);
+  });
+    roomInstance.registerRpcMethod("addToCart", async (data) => {
+      const { productId, variantId, quantity } = JSON.parse(data.payload);
+
+      const products = await getMenuProducts();
+
+      const product = products.find((item) => item.id === productId);
+
+      if (!product) {
+        return JSON.stringify({
+          success: false,
+          message: "Product not found.",
+        });
+      }
+
+      const variant = product.variants.find(
+        (item) => item.id === variantId
+      );
+
+      if (!variant) {
+        return JSON.stringify({
+          success: false,
+          message: "Product variant not found.",
+        });
+      }
+
+      cartActions.addToCart(product, quantity, variantId);
+
+      return JSON.stringify({
+        success: true,
+        message: "Product added to cart.",
+      });
+    });
       connectingRef.current = false;
       setStatus("waiting");
 
-      
       agentTimeoutRef.current = setTimeout(() => {
         if (!agentJoinedRef.current) {
           setError(
@@ -331,7 +407,7 @@ export function useLiveKitAssistant(
     } finally {
       connectingRef.current = false;
     }
-  }, [clearAgentTimeout, resetSession, syncStatus]);
+  }, [clearAgentTimeout, resetSession, syncStatus, cartActions.addToCart]);
 
   const disconnect = useCallback(async () => {
     const room = roomRef.current;

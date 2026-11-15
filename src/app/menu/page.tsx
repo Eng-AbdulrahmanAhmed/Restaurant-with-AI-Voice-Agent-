@@ -49,20 +49,6 @@ import burgerLogo from "@/assets/logo-no-background.png";
 import heroImage from "@/assets/hero-image.png";
 import { createClient } from "@/lib/supabase/client";
 
-/* ============================================================================
-   STYLE MOD (menu design v3, single file only)
-   - Hero section added with large image + heading (landing-style)
-   - Product cards now photo-TOP (larger image, landing Fan-favorites style)
-   - Stats strip more prominent with larger cards
-   - Filter bar more compact and visually polished
-   - Order tray more polished with better visual hierarchy
-   - Better spacing and breathing room throughout
-   - AI console floating popup (same as before)
-   - Whole page uses site tokens (cream / ink / orange / brown / gold)
-   - Logic untouched â€” styling only.
-   Undo: the pre-restyle version is in git (commit e84c6d2).
-============================================================================ */
-
 const CATEGORIES = [
   { label: "All Items", icon: Utensils },
   { label: "Burgers", icon: Hamburger },
@@ -166,11 +152,19 @@ export default function CustomerMenuPage() {
   const grandTotal = subtotal > 0 ? subtotal : 0;
   const router = useRouter();
   const { status, error, messages, micEnabled, audioBlocked, connect, disconnect, toggleMic, enableAudio } =
-    useLiveKitAssistant(() => ({
-      items: cart,
-      total: grandTotal,
-      currency: "EGP",
-    }));
+    useLiveKitAssistant(
+  () => ({
+    items: cart,
+    total: grandTotal,
+    currency: "EGP",
+  }),
+  {
+    addToCart,
+    updateCartQty,
+    removeCartItem,
+    clearCart,
+  }
+);
 
   const assistantStatusLabel =
     status === "error"
