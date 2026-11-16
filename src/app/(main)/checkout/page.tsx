@@ -8,6 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { createClient } from "@/lib/supabase/client";
 import type { DeliveryInfo } from "@/types/delivery";
 import { hasDeliveryErrors, validateDeliveryInfo } from "@/lib/delivery";
+import { PriceText, AnimatedCount } from "@/components/cart/AnimatedValue";
 
 const initialDeliveryInfo: DeliveryInfo = {
   fullName: "",
@@ -284,16 +285,20 @@ export default function CheckoutPage() {
             <div className="mt-4 space-y-2 text-xs font-semibold text-brown">
               <div className="flex justify-between">
                 <span>Items</span>
-                <span className="text-ink">{totalItemCount}</span>
+                <span className="text-ink">
+                  <AnimatedCount value={totalItemCount} />
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="text-ink">EGP {subtotal.toFixed(2)}</span>
+                <span className="text-ink">
+                  <PriceText value={subtotal} />
+                </span>
               </div>
               <div className="flex justify-between border-t border-ink/10 pt-3 text-sm font-bold text-ink">
                 <span>Total</span>
                 <span className="font-display text-2xl font-bold text-orange">
-                  EGP {subtotal.toFixed(2)}
+                  <PriceText value={subtotal} interpolate />
                 </span>
               </div>
             </div>
@@ -305,7 +310,9 @@ export default function CheckoutPage() {
                     {item.quantity}x {item.name}
                     {item.variantName ? ` (${item.variantName})` : ""}
                   </span>
-                  <span className="font-semibold text-ink">EGP {(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="font-semibold text-ink">
+                    <PriceText value={item.price * item.quantity} />
+                  </span>
                 </div>
               ))}
             </div>

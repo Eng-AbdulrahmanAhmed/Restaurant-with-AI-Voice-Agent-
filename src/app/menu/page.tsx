@@ -5,20 +5,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { MenuProduct } from "@/types/types";
-import type { CartItem } from "@/types/cart";
 import { useCart } from "@/context/CartContext";
 import { getPublicMenuProducts } from "@/services/publicMenuService";
 import { useLiveKitAssistant } from "@/hooks/useLiveKitAssistant";
+import { useCartBusEvent } from "@/lib/cartFeedback";
+import { CartBadgeButton } from "@/components/cart/CartBadgeButton";
+import { CartRowList } from "@/components/cart/CartRowList";
+import { EmptyTrayState } from "@/components/cart/EmptyTrayState";
+import { PriceText, AnimatedCount } from "@/components/cart/AnimatedValue";
+import { QtyStepper } from "@/components/cart/QtyStepper";
 type Product = MenuProduct;
 
 import {
   Search,
-  ShoppingCart,
   Mic,
   MicOff,
   Plus,
-  Minus,
-  Trash2,
   X,
   Star,
   Flame,
@@ -151,6 +153,31 @@ export default function CustomerMenuPage() {
   const { cart, addToCart, updateCartQty, removeCartItem, clearCart, totalItemCount, subtotal } = useCart();
   const grandTotal = subtotal > 0 ? subtotal : 0;
   const router = useRouter();
+
+  // --- Cart interaction FX -------------------------------------------------
+  // Manual card flash: driven by the committed "manual add" feedback event,
+  // never by the click itself (a failed add must not light up). Voice adds
+  // never flash a card — their feedback lives at the cart icon.
+  const [flashProductId, setFlashProductId] = useState<string | null>(null);
+  useCartBusEvent((event) => {
+    if (event.kind !== "add" || event.source !== "manual") return;
+    setFlashProductId(event.productId ?? null);
+  });
+
+  // Voice-originated actions: the AI console (RPC handlers and the local
+  // quick-command parser) goes through these wrappers, so every change keeps
+  // its source and the UI can show AI-specific feedback.
+  const voiceCartActions = useMemo(
+    () => ({
+      addToCart: (product: Product, quantity?: number, variantId?: string) =>
+        addToCart(product, quantity, variantId, "voice"),
+      updateCartQty: (id: string, delta: number) => updateCartQty(id, delta, "voice"),
+      removeCartItem: (id: string) => removeCartItem(id, "voice"),
+      clearCart: () => clearCart("voice"),
+    }),
+    [addToCart, updateCartQty, removeCartItem, clearCart]
+  );
+
   const { status, error, messages, micEnabled, audioBlocked, connect, disconnect, toggleMic, enableAudio } =
     useLiveKitAssistant(
   () => ({
@@ -158,12 +185,7 @@ export default function CustomerMenuPage() {
     total: grandTotal,
     currency: "EGP",
   }),
-  {
-    addToCart,
-    updateCartQty,
-    removeCartItem,
-    clearCart,
-  }
+  voiceCartActions
 );
 
   const assistantStatusLabel =
@@ -377,7 +399,7 @@ export default function CustomerMenuPage() {
     });
 
     if (matches.length > 0) {
-      matches.forEach((m) => addToCart(m.product, m.qty));
+      matches.forEach((m) => addToCart(m.product, m.qty, undefined, "voice"));
       const summary = matches
         .map((m) => `${m.qty}x ${m.product.name}`)
         .join(", ");
@@ -498,13 +520,11 @@ export default function CustomerMenuPage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <button
+            <CartBadgeButton
+              count={totalItemCount}
               onClick={() => setTrayOpen((v) => !v)}
-              className="relative flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2.5 shadow-sm transition hover:border-orange"
-            >
-              <ShoppingCart size={18} className="text-orange" />
-              <span className="text-xs font-bold">{totalItemCount}</span>
-            </button>
+              ariaLabel="Open order tray"
+            />
           </div>
         </div>
       </header>
@@ -676,7 +696,12 @@ export default function CustomerMenuPage() {
                   return (
                     <article
                       key={product.id}
-                      className="group flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-3 shadow-[0_10px_24px_-18px_rgba(36,23,8,0.4)] transition-all hover:-translate-y-0.5 hover:border-orange/40 hover:shadow-[0_16px_28px_-18px_rgba(36,23,8,0.5)]"
+                      onAnimationEnd={(event) => {
+                        if (event.animationName === "cart-card-flash") setFlashProductId(null);
+                      }}
+                      className={`group flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-3 shadow-[0_10px_24px_-18px_rgba(36,23,8,0.4)] transition-all hover:-translate-y-0.5 hover:border-orange/40 hover:shadow-[0_16px_28px_-18px_rgba(36,23,8,0.5)] ${
+                        flashProductId === product.id ? "cart-fx-card-flash" : ""
+                      }`}
                     >
                       {/* Photo top */}
                       <div className="relative h-44 w-full shrink-0 overflow-hidden rounded-xl bg-cream-deep">
@@ -755,31 +780,20 @@ export default function CustomerMenuPage() {
                           <button
                             type="button"
                             onClick={() => addToCart(product, 1, selectedId)}
-                            className="flex h-9 items-center gap-1.5 rounded-full bg-orange px-4 text-xs font-semibold text-cream shadow-[0_8px_18px_-6px_rgba(242,105,13,0.6)] transition-all hover:-translate-y-0.5 hover:bg-orange-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange motion-reduce:hover:translate-y-0 active:translate-y-0"
+                            className="flex h-9 items-center gap-1.5 rounded-full bg-orange px-4 text-xs font-semibold text-cream shadow-[0_8px_18px_-6px_rgba(242,105,13,0.6)] transition-all hover:-translate-y-0.5 hover:bg-orange-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange motion-reduce:hover:translate-y-0 active:translate-y-0 active:scale-95"
                           >
                             <Plus size={15} />
                             Add to Tray
                           </button>
                         ) : (
-                          <div className="flex items-center gap-1.5 rounded-full border border-ink/10 bg-cream p-1">
-                            <button
-                              type="button"
-                              onClick={() => updateCartQty(variant.id, -1)}
-                              className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-brown shadow-sm transition hover:bg-tomato/10 hover:text-tomato"
-                            >
-                              <Minus size={13} />
-                            </button>
-                            <span className="w-6 text-center text-xs font-extrabold text-ink">
-                              {qty}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => updateCartQty(variant.id, 1)}
-                              className="flex h-7 w-7 items-center justify-center rounded-full bg-orange text-cream shadow-sm transition hover:bg-orange-deep"
-                            >
-                              <Plus size={13} />
-                            </button>
-                          </div>
+                          <QtyStepper
+                            size="card"
+                            quantity={qty}
+                            onIncrease={() => updateCartQty(variant.id, 1)}
+                            onDecrease={() => updateCartQty(variant.id, -1)}
+                            increaseLabel={`Add another ${product.name}`}
+                            decreaseLabel={`Remove one ${product.name}`}
+                          />
                         )}
 
                         {qty > 0 && (
@@ -852,22 +866,25 @@ export default function CustomerMenuPage() {
             )}
           </div>
 
-          {/* ===============================================================
-              SECTION 6 â€” ORDER TRAY POPUP (opened from the navbar cart
-              button; ALWAYS MOUNTED, only visually hidden)
-          ================================================================ */}
+          <div
+            aria-hidden
+            onClick={() => setTrayOpen(false)}
+            className={`fixed inset-0 z-40 bg-ink/10 transition-opacity duration-300 ${
+              trayOpen ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
+          />
           <div
             className={`fixed top-[84px] right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)]
                         overflow-hidden rounded-[2rem] border border-ink/10 bg-white
-                        shadow-[0_24px_60px_-24px_rgba(36,23,8,0.45)] transition-all duration-300
-                        ${trayOpen ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-4 opacity-0"}`}
+                        shadow-[0_24px_60px_-24px_rgba(36,23,8,0.45)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] origin-top-right
+                        ${trayOpen ? "pointer-events-auto translate-y-0 scale-100 opacity-100" : "pointer-events-none -translate-y-4 scale-[0.97] opacity-0"}`}
           >
             <div className="p-5">
                 {/* Header + order type toggle */}
                 <div className="flex items-center justify-between border-b border-ink/10 pb-3.5">
                   <div className="flex items-center gap-2">
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-xs font-bold text-cream">
-                      {totalItemCount}
+                      <AnimatedCount value={totalItemCount} />
                     </span>
                     <h3 className="font-display text-base font-bold text-ink">
                       Your Order Tray
@@ -908,65 +925,20 @@ export default function CustomerMenuPage() {
                 </div>
 
                 {/* Items list */}
-                <div className="my-3.5 max-h-56 space-y-2.5 overflow-y-auto pr-1">
-                  {cart.length === 0 ? (
-                    <div className="py-8 text-center text-xs text-brown">
-                      <p className="font-display text-sm font-bold text-ink">
-                        Tray is hungry!
-                      </p>
-                      <p className="mt-0.5">
-                        Add items via the menu or open GrillBot below.
-                      </p>
-                    </div>
-                  ) : (
-                    cart.map((entry) => (
-                      <div
-                        key={entry.id}
-                        className="flex items-center justify-between gap-2.5 rounded-xl border border-ink/5 bg-cream/60 p-2"
-                      >
-                        <img
-                          src={entry.image}
-                          alt={entry.name}
-                          className="flex h-11 w-11 items-center justify-center rounded-lg bg-cream-deep object-contain p-1"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <h4 className="truncate text-xs font-bold text-ink">
-                            {entry.name}
-                            {entry.variantName ? ` \u00B7 ${entry.variantName}` : ""}
-                          </h4>
-                          <p className="font-display text-xs font-bold text-orange">
-                            EGP {(entry.price * entry.quantity).toFixed(2)}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-1 rounded-full border border-ink/10 bg-white p-0.5">
-                          <button
-                            onClick={() => updateCartQty(entry.id, -1)}
-                            className="flex h-5 w-5 items-center justify-center rounded-full text-brown hover:bg-cream"
-                          >
-                            <Minus size={11} />
-                          </button>
-                          <span className="w-4 text-center text-[11px] font-bold">
-                            {entry.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateCartQty(entry.id, 1)}
-                            className="flex h-5 w-5 items-center justify-center rounded-full text-brown hover:bg-cream"
-                          >
-                            <Plus size={11} />
-                          </button>
-                        </div>
-
-                        <button
-                          onClick={() => removeCartItem(entry.id)}
-                          className="text-brown/50 transition-colors hover:text-tomato"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
-                    ))
-                  )}
-                </div>
+                <CartRowList
+                  items={cart}
+                  variant="tray"
+                  onIncrease={(id) => updateCartQty(id, 1)}
+                  onDecrease={(id) => updateCartQty(id, -1)}
+                  onRemove={(id) => removeCartItem(id)}
+                  className="my-3.5 max-h-56 space-y-2.5 overflow-y-auto pr-1"
+                  emptyState={
+                    <EmptyTrayState
+                      title="Tray is hungry!"
+                      description="Add items via the menu or open GrillBot below."
+                    />
+                  }
+                />
 
                 {/* Billing breakdown */}
                 <div className="space-y-1.5 border-t border-ink/10 pt-3 text-xs font-semibold text-brown">
@@ -986,7 +958,7 @@ export default function CustomerMenuPage() {
                   <div className="flex items-baseline justify-between text-sm font-bold text-ink">
                     <span>Total Due</span>
                     <span className="font-display text-2xl font-bold text-orange">
-                      EGP {grandTotal.toFixed(2)}
+                      <PriceText value={grandTotal} interpolate />
                     </span>
                   </div>
                 </div>
@@ -1000,7 +972,7 @@ export default function CustomerMenuPage() {
                   </Link>
                   <button
                     type="button"
-                    onClick={clearCart}
+                    onClick={() => clearCart()}
                     disabled={cart.length === 0}
                     className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-white px-4 py-2 text-xs font-bold text-brown transition hover:border-tomato hover:text-tomato disabled:cursor-not-allowed disabled:opacity-40"
                   >

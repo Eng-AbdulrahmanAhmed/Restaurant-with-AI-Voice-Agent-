@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { CartProvider } from "@/context/CartContext";
+import { CartAnnouncer } from "@/components/cart/CartAnnouncer";
 
 export function CustomerCartBoundary({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -20,5 +21,11 @@ export function CustomerCartBoundary({ children }: { children: React.ReactNode }
     return <>{children}</>;
   }
 
-  return <CartProvider>{children}</CartProvider>;
+  return (
+    <CartProvider>
+      {children}
+      {/* One screen-reader status region for all customer cart routes. */}
+      <CartAnnouncer />
+    </CartProvider>
+  );
 }

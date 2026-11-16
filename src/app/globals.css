@@ -224,3 +224,459 @@ body {
 .card-in {
   animation: card-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+/* ========================================
+   CART INTERACTION FX
+   Coordinated feedback for cart add / qty / remove / clear.
+   Only transform + opacity animate (no layout thrash). All effects are
+   disabled under prefers-reduced-motion below.
+   ======================================== */
+
+/* --- Value (price / count) transition --------------------------------- */
+/* Applied to a keyed span: the old value unmounts, the new one rolls in
+   from below (increase) or above (decrease) with a brief orange flash.   */
+@keyframes cart-value-in {
+  0% {
+    opacity: 0;
+    transform: translateY(55%) scale(0.9);
+    color: var(--color-orange-deep);
+  }
+  40% {
+    opacity: 1;
+    color: var(--color-orange);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cart-value-in {
+  display: inline-block;
+  animation: cart-value-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cart-value-in[data-dir="down"] {
+  animation-name: cart-value-in-down;
+}
+
+@keyframes cart-value-in-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-55%) scale(0.9);
+    color: var(--color-brown);
+  }
+  40% {
+    opacity: 1;
+    color: var(--color-tomato);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --- Product card flash (manual add) ----------------------------------- */
+/* Illuminated border + soft orange glow, quick and contained.            */
+@keyframes cart-card-flash {
+  0% {
+    border-color: var(--color-orange);
+    box-shadow:
+      0 0 0 3px rgba(242, 105, 13, 0.22),
+      0 10px 24px -18px rgba(36, 23, 8, 0.4);
+    transform: scale(1.015);
+  }
+  70% {
+    border-color: var(--color-orange-line);
+    box-shadow:
+      0 0 0 2px rgba(242, 105, 13, 0.12),
+      0 10px 24px -18px rgba(36, 23, 8, 0.4);
+    transform: scale(1);
+  }
+  100% {
+    border-color: var(--color-ink-10, rgba(36, 23, 8, 0.1));
+    box-shadow: 0 10px 24px -18px rgba(36, 23, 8, 0.4);
+    transform: scale(1);
+  }
+}
+
+.cart-fx-card-flash {
+  animation: cart-card-flash 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --- Cart icon: impact bounce + glow ----------------------------------- */
+@keyframes cart-icon-bounce {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.22);
+  }
+  55% {
+    transform: scale(0.94);
+  }
+  75% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-fx-icon-bounce {
+  animation: cart-icon-bounce 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cart-icon-glow {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(242, 105, 13, 0),
+      0 1px 0 0 rgba(36, 23, 8, 0.04);
+  }
+  35% {
+    box-shadow:
+      0 0 0 6px rgba(242, 105, 13, 0.28),
+      0 0 22px 4px rgba(242, 105, 13, 0.35);
+    border-color: var(--color-orange);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(242, 105, 13, 0),
+      0 1px 0 0 rgba(36, 23, 8, 0.04);
+  }
+}
+
+.cart-fx-icon-glow {
+  animation: cart-icon-glow 0.5s ease-out;
+}
+
+/* --- AI-origin indicator ----------------------------------------------- */
+/* Orange ring pulse + tiny voice-wave bars near the cart icon.           */
+@keyframes cart-ai-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(242, 105, 13, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgba(242, 105, 13, 0);
+  }
+}
+
+.cart-fx-ai-pulse {
+  animation: cart-ai-pulse 0.7s ease-out 2;
+}
+
+@keyframes cart-ai-wave {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.cart-ai-wave-bar {
+  transform-origin: center;
+  animation: cart-ai-wave 0.7s ease-in-out infinite;
+}
+
+/* --- Row entrance / exit ------------------------------------------------ */
+@keyframes cart-row-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cart-row-enter {
+  animation: cart-row-enter 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* The exiting wrapper collapses its occupied vertical space via an
+   animatable grid-template-rows trick; the inner row fades/slides away.  */
+@keyframes cart-row-collapse {
+  from {
+    grid-template-rows: 1fr;
+  }
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+
+.cart-row-exit {
+  display: grid;
+  animation: cart-row-collapse 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: var(--cart-exit-delay, 0ms);
+  pointer-events: none;
+}
+
+.cart-row-exit > * {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@keyframes cart-row-leave {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(28px) scale(0.96);
+  }
+}
+
+.cart-row-exit .cart-row-leave {
+  animation: cart-row-leave 0.28s ease-in forwards;
+  animation-delay: var(--cart-exit-delay, 0ms);
+}
+
+/* --- AI highlight on an affected row ------------------------------------ */
+@keyframes cart-row-ai-glow {
+  0% {
+    border-color: var(--color-orange);
+    box-shadow: 0 0 0 3px rgba(242, 105, 13, 0.18);
+  }
+  100% {
+    border-color: var(--color-orange-line);
+    box-shadow: 0 0 0 0 rgba(242, 105, 13, 0);
+  }
+}
+
+.cart-fx-row-ai-glow {
+  animation: cart-row-ai-glow 0.9s ease-out;
+}
+
+/* --- Tray entrance polish ----------------------------------------------- */
+@keyframes cart-tray-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cart-tray-in {
+  transform-origin: top right;
+  animation: cart-tray-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --- Fly-to-cart layer --------------------------------------------------- */
+.cart-fly-layer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 90;
+  width: 44px;
+  height: 44px;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.cart-fly-layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 2px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 22px -10px rgba(36, 23, 8, 0.45);
+}
+
+/* --- 3D takeaway bag (BurgerHouse accent) -------------------------------- */
+.cart-3d-scene {
+  perspective: 420px;
+}
+
+.cart-3d-bag {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateY(-14deg) rotateX(4deg);
+  animation:
+    bag-float 4.5s ease-in-out infinite,
+    bag-entrance 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes bag-float {
+  0%,
+  100% {
+    transform: rotateY(-14deg) rotateX(4deg) translateY(0);
+  }
+  50% {
+    transform: rotateY(-10deg) rotateX(2deg) translateY(-5px);
+  }
+}
+
+@keyframes bag-entrance {
+  0% {
+    opacity: 0;
+    transform: rotateY(-24deg) rotateX(10deg) translateY(10px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateY(-14deg) rotateX(4deg) translateY(0) scale(1);
+  }
+}
+
+.cart-3d-bag-body {
+  width: 74px;
+  height: 84px;
+  border-radius: 4px 4px 7px 7px;
+  background:
+    linear-gradient(160deg, #fff7ec 0%, #f6e7cf 55%, #e9d3ac 100%);
+  box-shadow:
+    inset 6px 0 10px -8px rgba(36, 23, 8, 0.25),
+    inset -8px 0 12px -8px rgba(36, 23, 8, 0.3),
+    inset 0 -14px 18px -12px rgba(36, 23, 8, 0.2),
+    0 18px 26px -14px rgba(36, 23, 8, 0.4);
+}
+
+.cart-3d-bag-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 34px;
+  height: 18px;
+  background: linear-gradient(180deg, var(--color-orange) 0%, var(--color-orange-deep) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-3d-bag-band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.28) 0%, transparent 42%);
+}
+
+/* Bag side gussets give the flat front real depth */
+.cart-3d-bag-gusset {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+}
+.cart-3d-bag-gusset-left {
+  left: -9px;
+  background: linear-gradient(90deg, #e3cba2, #f2e2c4);
+  transform: rotateY(-38deg);
+  transform-origin: right center;
+  border-radius: 3px 0 0 4px;
+}
+.cart-3d-bag-gusset-right {
+  right: -9px;
+  background: linear-gradient(90deg, #f2e2c4, #d9bf94);
+  transform: rotateY(38deg);
+  transform-origin: left center;
+  border-radius: 0 3px 4px 0;
+}
+
+/* Rope handle */
+.cart-3d-bag-handle {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  width: 40px;
+  height: 34px;
+  transform: translateX(-50%);
+  border: 3px solid #c9a35e;
+  border-bottom: none;
+  border-radius: 20px 20px 0 0;
+  box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.5);
+}
+
+/* Soft contact shadow under the bag */
+.cart-3d-bag-shadow {
+  width: 64px;
+  height: 10px;
+  margin: 2px auto 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(36, 23, 8, 0.28), transparent 70%);
+  animation: bag-shadow-breathe 4.5s ease-in-out infinite;
+}
+
+@keyframes bag-shadow-breathe {
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scaleX(0.88);
+    opacity: 0.75;
+  }
+}
+
+/* --- Empty-state entrance ------------------------------------------------ */
+@keyframes cart-empty-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cart-empty-in {
+  animation: cart-empty-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* --- Stepper button press flash ----------------------------------------- */
+@keyframes cart-btn-flash-up {
+  0% {
+    box-shadow: 0 0 0 3px rgba(242, 105, 13, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(242, 105, 13, 0);
+  }
+}
+
+.cart-fx-btn-up {
+  animation: cart-btn-flash-up 0.3s ease-out;
+}
+
+@keyframes cart-btn-flash-down {
+  0% {
+    box-shadow: 0 0 0 3px rgba(36, 23, 8, 0.18);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(36, 23, 8, 0);
+  }
+}
+
+.cart-fx-btn-down {
+  animation: cart-btn-flash-down 0.3s ease-out;
+}
+
+/* --- Reduced motion ------------------------------------------------------ */
+/* Keep essential feedback (color/opacity) but drop movement.               */
+@media (prefers-reduced-motion: reduce) {
+  .cart-value-in,
+  .cart-fx-card-flash,
+  .cart-fx-icon-bounce,
+  .cart-fx-icon-glow,
+  .cart-fx-ai-pulse,
+  .cart-fx-btn-up,
+  .cart-fx-btn-down,
+  .cart-row-enter,
+  .cart-row-exit,
+  .cart-row-exit .cart-row-leave,
+  .cart-fx-row-ai-glow,
+  .cart-tray-in,
+  .cart-empty-in,
+  .cart-3d-bag,
+  .cart-3d-bag-shadow,
+  .cart-ai-wave-bar {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

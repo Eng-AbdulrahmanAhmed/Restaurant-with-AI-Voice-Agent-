@@ -2,15 +2,20 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
+import { ShoppingCart, X } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
+import { CartRowList, useCartExitActivity } from "@/components/cart/CartRowList";
+import { EmptyTrayState } from "@/components/cart/EmptyTrayState";
+import { PriceText, AnimatedCount } from "@/components/cart/AnimatedValue";
 
 export default function CartPage() {
   const { cart, updateCartQty, removeCartItem, clearCart, totalItemCount, subtotal } = useCart();
   const router = useRouter();
   const [orderType, setOrderType] = useState<"dine-in" | "takeaway">("dine-in");
   const grandTotal = subtotal;
+  // Keep the rows (and the exit animations) mounted until they finish.
+  const exitActive = useCartExitActivity();
 
   return (
     <main className="mx-auto w-full max-w-5xl px-6 py-16">
@@ -61,80 +66,29 @@ export default function CartPage() {
         </button>
       </div>
 
-      {cart.length === 0 ? (
-        <div className="mt-10 rounded-[1.75rem] border border-dashed border-ink/15 bg-white/60 p-12 text-center">
-          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-orange/10 text-orange">
-            <ShoppingCart size={26} strokeWidth={2.2} />
-          </span>
-          <h2 className="mt-3 font-display text-lg font-bold text-ink">Your tray is empty</h2>
-          <p className="mt-1 text-xs text-brown/60">
-            Add items from the menu to see them here.
-          </p>
+      {cart.length === 0 && !exitActive ? (
+        <EmptyTrayState
+          variant="page"
+          title="Your tray is empty"
+          description="Add items from the menu to see them here."
+        >
           <Link
             href="/menu"
             className="mt-5 inline-flex items-center gap-2 rounded-full bg-orange px-6 py-3 text-sm font-semibold text-cream transition hover:bg-orange-deep"
           >
             Browse menu
           </Link>
-        </div>
+        </EmptyTrayState>
       ) : (
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
-          <div className="space-y-3">
-            {cart.map((item) => (
-              <article
-                key={item.id}
-                className="flex items-center gap-3 rounded-[1.75rem] border border-ink/10 bg-white p-4 shadow-[0_14px_30px_-24px_rgba(36,23,8,0.35)]"
-              >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="h-14 w-14 shrink-0 rounded-xl bg-cream-deep object-contain p-1"
-                />
-                <div className="min-w-0 flex-1">
-                  <h3 className="truncate font-display text-sm font-bold text-ink">
-                    {item.name}
-                    {item.variantName ? ` \u00B7 ${item.variantName}` : ""}
-                  </h3>
-                  <p className="font-display text-sm font-bold text-orange">
-                    EGP {item.price.toFixed(2)}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-1.5 rounded-full border border-ink/10 bg-cream p-1">
-                  <button
-                    type="button"
-                    onClick={() => updateCartQty(item.id, -1)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-brown shadow-sm transition hover:bg-tomato/10 hover:text-tomato"
-                  >
-                    <Minus size={13} />
-                  </button>
-                  <span className="w-7 text-center text-xs font-extrabold text-ink">
-                    {item.quantity}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => updateCartQty(item.id, 1)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-orange text-cream shadow-sm transition hover:bg-orange-deep"
-                  >
-                    <Plus size={13} />
-                  </button>
-                </div>
-
-                <span className="font-display text-sm font-bold text-ink">
-                  EGP {(item.price * item.quantity).toFixed(2)}
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() => removeCartItem(item.id)}
-                  aria-label={`Remove ${item.name}`}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-brown/50 transition hover:bg-tomato/10 hover:text-tomato"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </article>
-            ))}
-          </div>
+          <CartRowList
+            items={cart}
+            variant="cart"
+            onIncrease={(id) => updateCartQty(id, 1)}
+            onDecrease={(id) => updateCartQty(id, -1)}
+            onRemove={(id) => removeCartItem(id)}
+            className="space-y-3"
+          />
 
           <aside className="space-y-4">
             <div className="sticky top-24 rounded-[1.75rem] border border-ink/10 bg-white p-5 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)]">
@@ -143,16 +97,20 @@ export default function CartPage() {
               <div className="mt-4 space-y-2 text-xs font-semibold text-brown">
                 <div className="flex justify-between">
                   <span>Items</span>
-                  <span className="text-ink">{totalItemCount}</span>
+                  <span className="text-ink">
+                    <AnimatedCount value={totalItemCount} />
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="text-ink">EGP {subtotal.toFixed(2)}</span>
+                  <span className="text-ink">
+                    <PriceText value={subtotal} />
+                  </span>
                 </div>
                 <div className="flex justify-between border-t border-ink/10 pt-3 text-sm font-bold text-ink">
                   <span>Total</span>
                   <span className="font-display text-2xl font-bold text-orange">
-                    EGP {grandTotal.toFixed(2)}
+                    <PriceText value={grandTotal} interpolate />
                   </span>
                 </div>
               </div>
@@ -174,7 +132,7 @@ export default function CartPage() {
 
               <button
                 type="button"
-                onClick={clearCart}
+                onClick={() => clearCart()}
                 className="mt-2 flex h-10 w-full items-center justify-center gap-1.5 rounded-full border border-ink/10 bg-white text-xs font-bold text-brown transition hover:border-tomato hover:text-tomato"
               >
                 <X size={13} strokeWidth={2.5} />
