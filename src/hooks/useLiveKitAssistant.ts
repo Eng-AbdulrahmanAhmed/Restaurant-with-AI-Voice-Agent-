@@ -38,11 +38,33 @@ const AGENT_JOIN_TIMEOUT_MS = 30_000;
  * dispatched into it, plays the agent's audio, and exposes the session state
  * the UI needs to show that something is really happening.
  */
+type CartActionResult = {
+  success: boolean;
+  message: string;
+};
+
 type CartActions = {
-  addToCart: (product: MenuProduct, quantity?: number, variantId?: string) => void;
-  updateCartQty: (id: string, delta: number) => void;
-  removeCartItem: (id: string) => void;
-  clearCart: () => void;
+  addToCart: (
+    product: MenuProduct,
+    quantity?: number,
+    variantId?: string,
+    source?: "voice" | "ui"
+  ) => Promise<CartActionResult>;
+
+  updateCartQty: (
+    id: string,
+    delta: number,
+    source?: "voice" | "ui"
+  ) => Promise<CartActionResult>;
+
+  removeCartItem: (
+    id: string,
+    source?: "voice" | "ui"
+  ) => Promise<CartActionResult>;
+
+  clearCart: (
+    source?: "voice" | "ui"
+  ) => Promise<CartActionResult>;
 };
 
 export function useLiveKitAssistant(
@@ -291,8 +313,9 @@ export function useLiveKitAssistant(
         setStatus("disconnected");
       });
 
-      await roomInstance.connect(data.serverUrl, data.participantToken);
-      roomInstance.registerRpcMethod("getCart", async () => {
+    await roomInstance.connect(data.serverUrl, data.participantToken);
+    
+    roomInstance.registerRpcMethod("getCart", async () => {
       try {
         console.log("getCart RPC called");
 
@@ -325,38 +348,125 @@ export function useLiveKitAssistant(
       product.name.toLowerCase().includes(normalizedQuery)
     );
     return JSON.stringify(matches);
-  });
+    });
     roomInstance.registerRpcMethod("addToCart", async (data) => {
-      const { productId, variantId, quantity } = JSON.parse(data.payload);
+  try {
+    const { productId, variantId, quantity } = JSON.parse(data.payload);
 
-      const products = await getMenuProducts();
+    const products = await getMenuProducts();
 
-      const product = products.find((item) => item.id === productId);
+    const product = products.find((item) => item.id === productId);
 
-      if (!product) {
-        return JSON.stringify({
-          success: false,
-          message: "Product not found.",
-        });
-      }
-
-      const variant = product.variants.find(
-        (item) => item.id === variantId
-      );
-
-      if (!variant) {
-        return JSON.stringify({
-          success: false,
-          message: "Product variant not found.",
-        });
-      }
-
-      cartActions.addToCart(product, quantity, variantId);
-
+    if (!product) {
       return JSON.stringify({
-        success: true,
-        message: "Product added to cart.",
+        success: false,
+        message: "Product not found.",
       });
+    }
+
+    const variant = product.variants.find(
+      (item) => item.id === variantId
+    );
+
+    if (!variant) {
+      return JSON.stringify({
+        success: false,
+        message: "Product variant not found.",
+      });
+    }
+
+    const result = await cartActions.addToCart(
+      product,
+      quantity,
+      variantId,
+      "voice"
+    );
+
+    return JSON.stringify(result);
+  } catch (error) {
+    console.error("addToCart RPC handler failed:", error);
+
+    return JSON.stringify({
+      success: false,
+      message: "Failed to add product to cart.",
+    });
+  }
+    });
+    roomInstance.registerRpcMethod("removeCartItem", async (data) => {
+  try {
+    console.log("removeCartItem RPC called");
+
+    const { id } = JSON.parse(data.payload);
+
+    if (!id) {
+      return JSON.stringify({
+        success: false,
+        message: "Cart item ID is required.",
+      });
+    }
+
+    const result = await cartActions.removeCartItem(id, "voice");
+
+    console.log("removeCartItem result:", result);
+
+    return JSON.stringify(result);
+  } catch (error) {
+    console.error("removeCartItem RPC handler failed:", error);
+
+    return JSON.stringify({
+      success: false,
+      message: "Failed to remove item from cart.",
+    });
+  }
+    });
+    roomInstance.registerRpcMethod("clearCart", async () => {
+      try {
+        console.log("clearCart RPC called");
+
+        const result = await cartActions.clearCart("voice");
+
+        console.log("clearCart result:", result);
+
+        return JSON.stringify(result);
+      } catch (error) {
+        console.error("clearCart RPC handler failed:", error);
+
+        return JSON.stringify({
+          success: false,
+          message: "Failed to clear the cart.",
+        });
+      }
+    });
+    roomInstance.registerRpcMethod("updateCartQty", async (data) => {
+  try {
+    console.log("updateCartQty RPC called");
+
+    const { id, delta } = JSON.parse(data.payload);
+
+    if (!id || !Number.isInteger(delta) || delta === 0) {
+      return JSON.stringify({
+        success: false,
+        message: "A valid cart item ID and non-zero quantity change are required.",
+      });
+    }
+
+    const result = await cartActions.updateCartQty(
+      id,
+      delta,
+      "voice"
+    );
+
+    console.log("updateCartQty result:", result);
+
+    return JSON.stringify(result);
+  } catch (error) {
+    console.error("updateCartQty RPC handler failed:", error);
+
+    return JSON.stringify({
+      success: false,
+      message: "Failed to update item quantity.",
+    });
+  }
     });
       connectingRef.current = false;
       setStatus("waiting");
@@ -407,7 +517,16 @@ export function useLiveKitAssistant(
     } finally {
       connectingRef.current = false;
     }
-  }, [clearAgentTimeout, resetSession, syncStatus, cartActions.addToCart]);
+  }, 
+  [ 
+    clearAgentTimeout,
+    resetSession,
+    syncStatus,
+    cartActions.addToCart,
+    cartActions.updateCartQty,
+    cartActions.removeCartItem,
+    cartActions.clearCart,
+  ]);
 
   const disconnect = useCallback(async () => {
     const room = roomRef.current;
