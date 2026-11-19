@@ -530,54 +530,64 @@ export default function CustomerMenuPage() {
       </header>
 
       {/* =====================================================================
-          SECTION 3 â€” COMPACT HERO BAR (animated gradient, blobs, burger art)
+          SECTION 3 — ARTISAN BANNER
+          Tier 1: editorial lockup + compact signature stamp.
+          Tier 2: full-width spec strip with the four kitchen stats.
       ===================================================================== */}
-      <section className="relative overflow-hidden border-b border-ink/10 bg-cream-deep/40 py-7">
-        {/* animated gradient wash + drifting blobs */}
-        <div className="animate-gradient-x absolute inset-0 bg-[linear-gradient(115deg,transparent_0%,rgba(242,105,13,0.12)_38%,transparent_65%,rgba(36,23,8,0.05)_100%)]" />
-        <div className="animate-blob absolute -left-16 -top-20 h-64 w-64 rounded-full bg-orange/15 blur-3xl" />
-        <div className="animate-blob animation-delay-2000 absolute right-32 top-10 h-56 w-56 rounded-full bg-tomato/10 blur-3xl" />
-        <div className="animate-blob animation-delay-4000 absolute bottom-[-3rem] left-1/3 h-48 w-48 rounded-full bg-gold/15 blur-3xl" />
+      <section className="hero-artisan relative overflow-hidden border-b border-ink/10">
+        <div className="relative mx-auto max-w-[1500px] px-6 pt-7 lg:px-10 lg:pt-9">
+          <div className="grid items-center gap-6 sm:grid-cols-[1fr_auto]">
+            <div className="min-w-0">
+              {/* Eyebrow: rule · FROM THE ARTISAN MENU · ember */}
+              <div className="flex items-center gap-3">
+                <span className="h-px w-10 shrink-0 bg-orange/60" />
+                <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-orange-deep sm:text-[11px]">
+                  <Flame size={12} strokeWidth={2.5} className="text-orange" />
+                  From the Artisan Menu
+                </span>
+              </div>
 
-        <div className="relative mx-auto grid max-w-[1500px] grid-cols-[1fr_auto] items-center gap-6 px-6 lg:px-10">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-orange-deep shadow-sm">
-              <Flame size={12} />
-              Flame-Seared Daily
-            </span>
-            <h1 className="mt-2.5 font-display text-2xl font-black tracking-tight text-ink sm:text-3xl xl:text-4xl">
-              Order Our{" "}
-              <span className="animate-gradient-x bg-[linear-gradient(90deg,var(--color-orange-deep),var(--color-gold),var(--color-tomato))] bg-clip-text text-transparent italic">
-                Artisan Menu
-              </span>
-            </h1>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              {RESTAURANT_STATS.map((stat) => {
-                const Icon = stat.icon;
-                return (
-                  <span
-                    key={stat.label}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-white/80 px-3 py-1.5 text-[11px] font-semibold text-brown shadow-sm backdrop-blur-sm"
-                  >
-                    <Icon size={13} className="text-orange" />
-                    {stat.label}
-                    <strong className="font-display font-bold text-ink">{stat.value}</strong>
-                  </span>
-                );
-              })}
+              <h1 className="mt-3 font-display text-3xl font-black leading-[1.1] tracking-tight text-ink sm:text-4xl xl:text-[2.75rem]">
+                Flame-Seared <span className="italic text-orange-deep">Daily</span>
+              </h1>
+              <div className="mt-2.5 flex items-center gap-3">
+                <span className="h-[2px] w-8 shrink-0 bg-orange" />
+                <p className="font-display text-sm font-semibold text-brown sm:text-base">
+                  Order Our Artisan Menu
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* floating burger art */}
-          <div className="relative hidden h-36 w-36 shrink-0 sm:block lg:h-40 lg:w-40">
-            <div className="animate-spin-slow absolute inset-0 rounded-full border-2 border-dashed border-orange/30" />
-            <div className="animate-float relative h-full w-full">
+            {/* Compact framed stamp — deliberately small, no floating oversized art */}
+            <div className="relative hidden h-24 w-24 shrink-0 sm:block lg:h-28 lg:w-28">
+              <span aria-hidden className="absolute -inset-1.5 rounded-full border border-orange/30" />
               <img
                 src={heroImage.src}
                 alt="Signature flame-grilled burger"
-                className="h-full w-full rounded-full object-cover shadow-[0_18px_36px_-14px_rgba(36,23,8,0.45)]"
+                className="relative h-full w-full rounded-full border-[3px] border-cream object-cover shadow-[0_10px_22px_-10px_rgba(36,23,8,0.5)] ring-1 ring-ink/10"
               />
             </div>
+          </div>
+
+          {/* Full-width spec strip: four unchanged kitchen stats */}
+          <div className="hero-spec-strip mt-7 grid grid-cols-2 border-y border-ink/10 sm:grid-cols-4">
+            {RESTAURANT_STATS.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div key={stat.label} className="flex min-w-0 items-center gap-2.5 px-3 py-2.5 sm:px-4 sm:py-3">
+                  <Icon size={15} className="shrink-0 text-orange" />
+                  <div className="min-w-0">
+                    <p className="truncate text-[9px] font-bold uppercase tracking-[0.16em] text-brown/60">
+                      {stat.label}
+                    </p>
+                    <p className="truncate font-display text-sm font-bold text-ink sm:text-base">
+                      {stat.value}
+                    </p>
+                    <p className="truncate text-[10px] text-brown/60">{stat.sub}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
