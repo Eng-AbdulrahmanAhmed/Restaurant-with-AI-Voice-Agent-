@@ -680,3 +680,41 @@ body {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ========================================
+   MENU HERO — EDITORIAL ARTISAN
+   Static warm wash and hairline spec strip. No new motion.
+   ======================================== */
+
+.hero-artisan {
+  background-image:
+    radial-gradient(ellipse at 88% 42%, rgba(242, 105, 13, 0.1) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, transparent 100%);
+}
+
+/* Hairline dividers between the four spec cells: 2x2 on mobile, 4-up from sm. */
+.hero-spec-strip > * {
+  border-left: 1px solid rgba(36, 23, 8, 0.1);
+}
+
+.hero-spec-strip > *:nth-child(2n + 1) {
+  border-left: 0;
+}
+
+.hero-spec-strip > *:nth-child(n + 3) {
+  border-top: 1px solid rgba(36, 23, 8, 0.1);
+}
+
+@media (min-width: 640px) {
+  .hero-spec-strip > *:nth-child(2n + 1) {
+    border-left: 1px solid rgba(36, 23, 8, 0.1);
+  }
+
+  .hero-spec-strip > *:first-child {
+    border-left: 0;
+  }
+
+  .hero-spec-strip > *:nth-child(n + 3) {
+    border-top: 0;
+  }
+}
