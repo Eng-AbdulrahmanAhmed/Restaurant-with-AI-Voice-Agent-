@@ -169,8 +169,8 @@ export default function TableSelectionPage() {
           <h1 className="mt-1 font-display text-3xl font-black tracking-tight text-ink lg:text-4xl">
             Choose your <span className="italic text-orange">table</span>
           </h1>
-          <p className="mt-1 text-xs leading-relaxed text-brown">
-            Pick your party size, then select an available table on the floor plan.
+          <p className="mt-1 text-xs leading-relaxed text-brown/80">
+            Choose a party size and pick an available table.
           </p>
         </div>
         <Link
@@ -190,7 +190,7 @@ export default function TableSelectionPage() {
               <select
                 value={partySize}
                 onChange={(event) => setPartySize(Number(event.target.value))}
-                className="h-9 rounded-full border border-ink/10 bg-cream px-3 text-xs font-medium text-ink outline-none transition focus:border-orange focus:ring-2 focus:ring-orange/30"
+                className="h-10 rounded-full border border-ink/12 bg-white px-3 text-xs font-semibold text-ink outline-none transition focus:border-orange focus:ring-2 focus:ring-orange/25"
               >
                 {Array.from({ length: 10 }, (_, index) => index + 1).map((size) => (
                   <option key={size} value={size}>
@@ -209,10 +209,10 @@ export default function TableSelectionPage() {
                     type="button"
                     onClick={() => setSelectedFloor(floor)}
                     className={
-                      "rounded-full px-4 py-2 text-[11px] font-bold transition-all duration-200 " +
+                      "rounded-full border px-4 py-2 text-[11px] font-bold transition-all duration-200 " +
                       (active
-                        ? "bg-ink text-cream shadow-[0_8px_18px_-8px_rgba(36,23,8,0.6)]"
-                        : "border border-ink/10 bg-white text-brown/70 hover:border-orange hover:text-orange")
+                        ? "border-ink bg-ink text-cream shadow-[0_8px_18px_-8px_rgba(36,23,8,0.6)]"
+                        : "border-ink/12 bg-white text-brown hover:border-orange hover:text-orange")
                     }
                   >
                     {floor}
@@ -222,7 +222,7 @@ export default function TableSelectionPage() {
             </div>
           </div>
 
-          <div className="relative h-[420px] w-full overflow-hidden rounded-[2rem] border border-ink/10 bg-[linear-gradient(180deg,rgba(242,230,204,0.95),rgba(250,243,226,0.75))] shadow-[0_24px_48px_-28px_rgba(36,23,8,0.45)]">
+          <div className="relative h-[420px] w-full overflow-hidden rounded-[2rem] border border-ink/10 bg-white shadow-xl">
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(36,23,8,0.09)_1px,transparent_0)] [background-size:28px_28px]"
@@ -263,16 +263,17 @@ export default function TableSelectionPage() {
                     type="button"
                     disabled={disabled}
                     onClick={() => !disabled && setSelectedTableId(table.id)}
+                    aria-selected={selected}
                     className={`absolute flex flex-col items-center justify-center gap-0.5 border text-[11px] font-bold transition-all duration-200 ${
                       selected
-                        ? "h-20 w-20 rounded-full border-ink bg-ink text-cream shadow-[0_12px_24px_-10px_rgba(36,23,8,0.7)] ring-4 ring-orange/30"
+                        ? "h-22 w-22 rounded-full border-ink bg-ink text-cream shadow-[0_12px_28px_-12px_rgba(36,23,8,0.7)] ring-4 ring-orange/30"
                         : tooSmall || unavailable
                           ? "h-16 w-16 rounded-full border-ink/10 bg-cream-deep text-brown/40 opacity-40 grayscale"
                           : table.shape === "round"
-                            ? "h-20 w-20 rounded-full border-lettuce/40 bg-lettuce/10 text-lettuce shadow-[0_14px_28px_-12px_rgba(36,23,8,0.45)] hover:-translate-y-1 hover:scale-105 hover:border-lettuce hover:bg-lettuce/20"
+                            ? "h-22 w-22 rounded-full border-lettuce/40 bg-lettuce/10 text-lettuce shadow-[0_14px_28px_-12px_rgba(36,23,8,0.45)] hover:-translate-y-1 hover:scale-105 hover:border-lettuce hover:bg-lettuce/20"
                             : table.shape === "square"
-                              ? "h-18 w-18 rounded-2xl border-lettuce/40 bg-lettuce/10 text-lettuce shadow-[0_14px_28px_-12px_rgba(36,23,8,0.45)] hover:-translate-y-1 hover:scale-105 hover:border-lettuce hover:bg-lettuce/20"
-                              : "h-14 w-28 rounded-2xl border-lettuce/40 bg-lettuce/10 text-lettuce shadow-[0_14px_28px_-12px_rgba(36,23,8,0.45)] hover:-translate-y-1 hover:scale-105 hover:border-lettuce hover:bg-lettuce/20"
+                              ? "h-20 w-20 rounded-2xl border-lettuce/40 bg-lettuce/10 text-lettuce shadow-[0_14px_28px_-12px_rgba(36,23,8,0.45)] hover:-translate-y-1 hover:scale-105 hover:border-lettuce hover:bg-lettuce/20"
+                              : "h-15 w-34 rounded-2xl border-lettuce/40 bg-lettuce/10 text-lettuce shadow-[0_14px_28px_-12px_rgba(36,23,8,0.45)] hover:-translate-y-1 hover:scale-105 hover:border-lettuce hover:bg-lettuce/20"
                     }`}
                     style={{
                       left: `${table.x}%`,
@@ -282,13 +283,13 @@ export default function TableSelectionPage() {
                     aria-label={`${table.label}, ${table.capacity} seats, ${table.status}`}
                   >
                     <span className="text-xs font-extrabold">{table.label}</span>
-                    <span className="text-[9px] font-semibold">{table.capacity} seats</span>
+                    <span className="text-[9px] font-semibold">{table.capacity}</span>
                   </button>
                 );
               })}
           </div>
 
-          <div className="flex flex-wrap gap-2 text-[10px] font-semibold text-brown/70">
+          <div className="mt-4 grid grid-cols-2 gap-2 text-[10px] font-semibold text-brown/70 sm:grid-cols-3">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-lettuce/30 bg-lettuce/10 px-2.5 py-1">
               <span className="h-2 w-2 rounded-full bg-lettuce" /> Available
             </span>
@@ -308,7 +309,7 @@ export default function TableSelectionPage() {
         </div>
 
         <aside className="space-y-4">
-          <div className="sticky top-24 rounded-[1.75rem] border border-ink/10 bg-white p-5 shadow-[0_14px_30px_-22px_rgba(36,23,8,0.35)]">
+          <div className="sticky top-24 rounded-[2.25rem] border border-ink/10 bg-white p-5 shadow-[0_24px_50px_-28px_rgba(36,23,8,0.4)]">
             <h2 className="font-display text-base font-bold text-ink">Reservation details</h2>
 
             <div className="mt-4 space-y-3">
@@ -319,7 +320,7 @@ export default function TableSelectionPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Full name"
-                  className="h-11 w-full rounded-full border border-ink/10 bg-cream px-4 text-sm text-ink placeholder:text-brown/50 outline-none transition focus:border-orange focus:ring-2 focus:ring-orange/30"
+                  className="h-11 w-full rounded-2xl border border-ink/12 bg-white px-4 text-sm font-medium text-ink placeholder:text-brown/55 outline-none transition focus:border-orange focus:ring-2 focus:ring-orange/25"
                 />
               </label>
               <label className="block">
@@ -329,16 +330,16 @@ export default function TableSelectionPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="01012345678"
-                  className="h-11 w-full rounded-full border border-ink/10 bg-cream px-4 text-sm text-ink placeholder:text-brown/50 outline-none transition focus:border-orange focus:ring-2 focus:ring-orange/30"
+                  className="h-11 w-full rounded-2xl border border-ink/12 bg-white px-4 text-sm font-medium text-ink placeholder:text-brown/55 outline-none transition focus:border-orange focus:ring-2 focus:ring-orange/25"
                 />
                 {phone && !/^01[0125]\d{8}$/.test(phone.replace(/[\s-]/g, "")) && (
                   <p className="mt-1 text-[11px] font-medium text-tomato">Enter a valid Egyptian mobile number.</p>
                 )}
               </label>
-              <div className="rounded-2xl border border-ink/10 bg-cream/50 p-3 text-xs text-brown">
-                <p className="font-semibold text-ink">Selected table</p>
-                <p className="mt-1 text-brown/70">
-                {selectedTable ? `${selectedTable.label} \u00B7 ${selectedTable.capacity} seats` : "No table selected yet"}
+              <div className="rounded-[1.5rem] border border-ink/10 bg-cream/60 p-3 text-xs text-brown">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown/60">Selected table</p>
+                <p className="mt-1 font-display text-base font-bold text-ink">
+                  {selectedTable ? `${selectedTable.label} · ${selectedTable.capacity} seats` : "No table selected yet"}
                 </p>
               </div>
             </div>
@@ -366,7 +367,7 @@ export default function TableSelectionPage() {
               type="button"
               onClick={handleConfirm}
               disabled={!canConfirm}
-              className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-orange text-xs font-extrabold uppercase tracking-wider text-cream shadow-[0_10px_24px_-8px_rgba(242,105,13,0.6)] transition-all hover:-translate-y-0.5 hover:bg-orange-deep hover:shadow-[0_14px_28px_-8px_rgba(242,105,13,0.7)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange motion-reduce:hover:translate-y-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40 active:translate-y-0"
+              className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-orange text-xs font-extrabold uppercase tracking-wider text-cream shadow-[0_8px_20px_-10px_rgba(242,105,13,0.55)] transition-all hover:bg-orange-deep hover:shadow-[0_12px_24px_-10px_rgba(242,105,13,0.65)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Check size={15} />
               Confirm Reservation

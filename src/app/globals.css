@@ -303,6 +303,55 @@ body {
   animation: cart-card-flash 0.36s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* --- Voice order: committed add-to-cart card highlight ----------------- */
+/* Temporary orange ring + check; fades fully back to the normal card.     */
+@keyframes voice-card-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  12% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.voice-card-highlight {
+  background: rgba(242, 105, 13, 0.05);
+  box-shadow:
+    0 0 0 2px var(--color-orange),
+    0 0 0 8px rgba(242, 105, 13, 0.12),
+    0 18px 38px -18px rgba(242, 105, 13, 0.55);
+  animation: voice-card-glow 2.2s ease-out forwards;
+}
+
+@keyframes voice-check-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-12deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.voice-card-check {
+  animation: voice-check-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
 /* --- Cart icon: impact bounce + glow ----------------------------------- */
 @keyframes cart-icon-bounce {
   0% {
@@ -678,6 +727,15 @@ body {
   .cart-ai-wave-bar {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+
+  /* Voice highlight keeps its color confirmation, drops the movement. */
+  .voice-card-highlight,
+  .voice-card-check {
+    animation: none !important;
+  }
+  .voice-card-highlight {
+    opacity: 1;
   }
 }
 

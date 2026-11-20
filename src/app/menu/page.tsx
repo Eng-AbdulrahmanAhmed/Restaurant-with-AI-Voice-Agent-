@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ import {
   Mic,
   MicOff,
   Plus,
+  Check,
   X,
   Star,
   Flame,
@@ -64,6 +65,9 @@ const EXTRA_CATEGORY_ICONS: Record<string, LucideIcon> = {
   Chicken: Drumstick,
   Pizza,
 };
+
+const ITEMS_PER_PAGE = 9;
+const VOICE_HIGHLIGHT_MS = 2200;
 
 // QUICK STATS â€” same card anatomy as DashboardOverview (tinted icon chips).
 const RESTAURANT_STATS = [
@@ -156,13 +160,88 @@ export default function CustomerMenuPage() {
 
   // --- Cart interaction FX -------------------------------------------------
   // Manual card flash: driven by the committed "manual add" feedback event,
-  // never by the click itself (a failed add must not light up). Voice adds
-  // never flash a card — their feedback lives at the cart icon.
+  // never by the click itself (a failed add must not light up).
   const [flashProductId, setFlashProductId] = useState<string | null>(null);
+
+  // Voice order feedback: only committed, successful voice add events get
+  // navigation + highlight. Failed/no-op adds emit no event at all.
+  const [voiceHighlight, setVoiceHighlight] = useState<{ productId: string; seq: number } | null>(null);
+  const voiceHighlightSeqRef = useRef(0);
+  const voiceFocusRef = useRef<string | null>(null);
+  const voicePageRef = useRef<{ page: number; category: string; search: string; diet: string } | null>(null);
+
   useCartBusEvent((event) => {
-    if (event.kind !== "add" || event.source !== "manual") return;
-    setFlashProductId(event.productId ?? null);
+    if (event.kind === "add" && event.source === "manual") {
+      setFlashProductId(event.productId ?? null);
+      return;
+    }
+
+    if (event.source !== "voice" || !event.productId) return;
+    if (event.kind !== "add" && event.kind !== "increase") return;
+
+    const product = products.find((candidate) => candidate.id === event.productId);
+    // If the product is not in the loaded menu, do not guess where to go.
+    if (!product) return;
+
+    const category = product.category;
+    const matchesSearch =
+      searchQuery.trim() === "" ||
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.ingredients.some((ingredient) =>
+        ingredient.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    const matchesDiet =
+      dietaryFilter === "all" ||
+      (dietaryFilter === "popular" ? !!product.popular : !!product.spicy);
+
+    const targetSearch = matchesSearch ? searchQuery : "";
+    const targetDiet = matchesDiet ? dietaryFilter : "all";
+    const categoryIndex = products
+      .filter((candidate) => candidate.category === category)
+      .findIndex((candidate) => candidate.id === product.id);
+    const targetPage = Math.floor(Math.max(0, categoryIndex) / ITEMS_PER_PAGE) + 1;
+
+    // Latest successful voice add wins; any previous highlight is replaced.
+    voiceHighlightSeqRef.current += 1;
+    const seq = voiceHighlightSeqRef.current;
+    voiceFocusRef.current = product.id;
+    setVoiceHighlight({ productId: product.id, seq });
+
+    const filtersWillChange =
+      category !== activeCategory ||
+      targetSearch !== searchQuery ||
+      targetDiet !== dietaryFilter;
+
+    if (filtersWillChange) {
+      // The filter-reset effect honours this target once filters are applied.
+      voicePageRef.current = {
+        page: targetPage,
+        category,
+        search: targetSearch,
+        diet: targetDiet,
+      };
+      setActiveCategory(category);
+      setSearchQuery(targetSearch);
+      setDietaryFilter(targetDiet);
+    } else if (currentPage !== targetPage) {
+      setCurrentPage(targetPage);
+    }
   });
+
+  // The customer taking manual control cancels any pending AI focus.
+  const cancelVoiceFocus = useCallback(() => {
+    voiceFocusRef.current = null;
+    voicePageRef.current = null;
+    setVoiceHighlight(null);
+  }, []);
+
+  // One highlight at a time; each new voice add restarts this timer.
+  useEffect(() => {
+    if (!voiceHighlight) return;
+    const timer = window.setTimeout(() => setVoiceHighlight(null), VOICE_HIGHLIGHT_MS);
+    return () => window.clearTimeout(timer);
+  }, [voiceHighlight]);
 
   // Voice-originated actions: the AI console (RPC handlers and the local
   // quick-command parser) goes through these wrappers, so every change keeps
@@ -461,17 +540,59 @@ export default function CustomerMenuPage() {
     });
   }, [activeCategory, searchQuery, dietaryFilter, products]);
 
-  // Pagination: 9 smaller cards per page
-  const ITEMS_PER_PAGE = 9;
+  // Pagination: 9 smaller cards per page. Filter changes reset to page 1,
+  // except when they came from a voice add that already computed the target
+  // page. Running this as an effect (not a timer) keeps manual page changes
+  // authoritative and avoids a delayed reset fighting the AI selection.
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
+  const lastFilterKeyRef = useRef<string | null>(null);
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => setCurrentPage(1), 0);
-    return () => window.clearTimeout(timeoutId);
+    const filterKey = `${activeCategory}|${searchQuery}|${dietaryFilter}`;
+    if (lastFilterKeyRef.current === filterKey) return;
+    const isFirstRender = lastFilterKeyRef.current === null;
+    lastFilterKeyRef.current = filterKey;
+
+    const pending = voicePageRef.current;
+    if (
+      pending &&
+      pending.category === activeCategory &&
+      pending.search === searchQuery &&
+      pending.diet === dietaryFilter
+    ) {
+      voicePageRef.current = null;
+      setCurrentPage(pending.page);
+    } else if (!isFirstRender) {
+      setCurrentPage(1);
+    }
   }, [activeCategory, searchQuery, dietaryFilter, products]);
+
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
+
+  // Scroll only after the card is actually rendered. One-shot: later manual
+  // navigation is never overridden.
+  useEffect(() => {
+    const productId = voiceFocusRef.current;
+    if (!productId || !voiceHighlight) return;
+
+    if (!paginatedProducts.some((candidate) => candidate.id === productId)) {
+      const pending = voicePageRef.current;
+      if (pending && currentPage !== pending.page) setCurrentPage(pending.page);
+      return;
+    }
+
+    voiceFocusRef.current = null;
+    voicePageRef.current = null;
+
+    const frame = requestAnimationFrame(() => {
+      document
+        .getElementById(`product-card-${productId}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [voiceHighlight, paginatedProducts, currentPage]);
 
   return (
     <div className="min-h-screen bg-cream text-ink selection:bg-orange selection:text-cream">
@@ -609,14 +730,20 @@ export default function CustomerMenuPage() {
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    cancelVoiceFocus();
+                    setSearchQuery(e.target.value);
+                  }}
                   placeholder="Search dishes or buns..."
                   className="h-10 w-full rounded-full border border-ink/10 bg-cream pl-9 pr-8 text-xs font-medium text-ink outline-none transition placeholder:text-brown/50 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/30"
                 />
                 {searchQuery && (
                   <button
                     type="button"
-                    onClick={() => setSearchQuery("")}
+                    onClick={() => {
+                      cancelVoiceFocus();
+                      setSearchQuery("");
+                    }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-brown/50 hover:text-ink"
                   >
                     <X size={14} />
@@ -636,7 +763,10 @@ export default function CustomerMenuPage() {
                     <button
                       key={label}
                       type="button"
-                      onClick={() => setActiveCategory(label)}
+                      onClick={() => {
+                        cancelVoiceFocus();
+                        setActiveCategory(label);
+                      }}
                       className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all duration-200 ${
                         active
                           ? "bg-ink text-cream shadow-[0_8px_18px_-8px_rgba(36,23,8,0.6)]"
@@ -669,7 +799,10 @@ export default function CustomerMenuPage() {
                   <button
                     key={key}
                     type="button"
-                    onClick={() => setDietaryFilter(key)}
+                    onClick={() => {
+                      cancelVoiceFocus();
+                      setDietaryFilter(key);
+                    }}
                     className={`flex h-8 flex-1 items-center justify-center gap-1 rounded-full text-[11px] font-bold transition-all duration-200 ${
                       dietaryFilter === key
                         ? "bg-orange text-cream shadow-[0_8px_18px_-8px_rgba(242,105,13,0.7)]"
@@ -706,13 +839,31 @@ export default function CustomerMenuPage() {
                   return (
                     <article
                       key={product.id}
+                      id={`product-card-${product.id}`}
                       onAnimationEnd={(event) => {
                         if (event.animationName === "cart-card-flash") setFlashProductId(null);
                       }}
-                      className={`group flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-3 shadow-[0_10px_24px_-18px_rgba(36,23,8,0.4)] transition-all hover:-translate-y-0.5 hover:border-orange/40 hover:shadow-[0_16px_28px_-18px_rgba(36,23,8,0.5)] ${
+                      className={`group relative flex h-full scroll-mt-28 flex-col rounded-2xl border border-ink/10 bg-white p-3 shadow-[0_10px_24px_-18px_rgba(36,23,8,0.4)] transition-all hover:-translate-y-0.5 hover:border-orange/40 hover:shadow-[0_16px_28px_-18px_rgba(36,23,8,0.5)] ${
                         flashProductId === product.id ? "cart-fx-card-flash" : ""
                       }`}
                     >
+                      {/* Voice add confirmation: only shown for a committed
+                          voice cart action. Keyed so repeat adds restart it. */}
+                      {voiceHighlight?.productId === product.id && (
+                        <div
+                          key={voiceHighlight.seq}
+                          role="status"
+                          className="voice-card-highlight pointer-events-none absolute inset-0 z-20 rounded-2xl"
+                        >
+                          <span className="voice-card-check absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-orange text-cream shadow-lg">
+                            <Check size={15} strokeWidth={3} />
+                          </span>
+                          <span className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-ink/90 px-2.5 py-1 text-[10px] font-bold text-cream shadow-md">
+                            Added by voice AI
+                          </span>
+                        </div>
+                      )}
+
                       {/* Photo top */}
                       <div className="relative h-44 w-full shrink-0 overflow-hidden rounded-xl bg-cream-deep">
                         {product.popular && (
@@ -835,7 +986,10 @@ export default function CustomerMenuPage() {
               <div className="mt-6 flex items-center justify-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  onClick={() => {
+                    cancelVoiceFocus();
+                    setCurrentPage((p) => Math.max(1, p - 1));
+                  }}
                   disabled={currentPage === 1}
                   aria-label="Previous page"
                   className="flex h-8 w-8 items-center justify-center rounded-full border border-ink/10 bg-white text-brown transition-colors hover:border-orange hover:text-orange disabled:cursor-not-allowed disabled:opacity-40"
@@ -846,7 +1000,10 @@ export default function CustomerMenuPage() {
                   <button
                     key={page}
                     type="button"
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => {
+                      cancelVoiceFocus();
+                      setCurrentPage(page);
+                    }}
                     className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-200 ${
                       page === currentPage
                         ? "bg-ink text-cream shadow-[0_4px_12px_-4px_rgba(36,23,8,0.4)]"
@@ -858,7 +1015,10 @@ export default function CustomerMenuPage() {
                 ))}
                 <button
                   type="button"
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  onClick={() => {
+                    cancelVoiceFocus();
+                    setCurrentPage((p) => Math.min(totalPages, p + 1));
+                  }}
                   disabled={currentPage === totalPages}
                   aria-label="Next page"
                   className="flex h-8 w-8 items-center justify-center rounded-full border border-ink/10 bg-white text-brown transition-colors hover:border-orange hover:text-orange disabled:cursor-not-allowed disabled:opacity-40"
